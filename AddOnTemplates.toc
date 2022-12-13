@@ -1,0 +1,12 @@
+## Title: AddOnTemplates
+## Notes: Manage AddOn Enabled / Disabled state
+## Author: Hound
+## Version: 0.1
+## SavedVariables: AddOnTemplates
+## SavedVariablesPerCharacter: AddOnTemplates
+## Interface: 30400
+## X-Interface: 30400
+
+core.lua
+cmds.lua
+init.lua
