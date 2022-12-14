@@ -1,57 +1,76 @@
 local Core = {} -- Class
 
+Core.DEBUG = false
+
 -- ADDON_NAME: AddOnTemplates
 Core.ADDON_NAME       = "AddOnTemplates"
-Core.TEMPLATE_DEFAULT = "Default"
+Core.DEFAULT_TEMPLATE = "Default"
 
 -- Current Character
 Core.Character = UnitName("player")
 
+-- If "true", saves addon state enablement for all characters. Otherwise, only
+-- saves for the current character.
+Core.GlobalAddOnState = false
+
 -- Store AddOnTemplates once loaded.
-Core.Templates = {}
+if not AddOnTemplates then
+  AddOnTemplates = {}
+end
+
+Core.Templates = AddOnTemplates
 
 -- Other useful module globals
 Core.CurrentStateEnablement = 0
-Core.CurrentState = nil
+Core.CurrentState = {}
 
 function Core:SetAddOnState()
   local state = {}
   for i=1, GetNumAddOns(), 1 do
     local name, title, notes, loadable, reason, security, _ = GetAddOnInfo(i)
-    local enabledState = GetAddOnEnabledState(name)
+    local enabledState = GetAddOnEnableState(nil, name)
 
-    if Core.CurrentStateEnablement < enabledState then
+    -- TODO: Handle Character vs. Global enabled.
+    -- TODO: Is this a number or a boolean? There's conflicting information. The docs
+    --    say it should be a number 0=disabled, 1=enabled for some, 2=enabled for all.
+    if Core.CurrentStateEnablement == (enabledState == true  or enabledState == 1 or enabledState == 2) then
       Core.CurrentStateEnablement = enabledState
     end
 
-    state[name] = {}
-    state[name].Index     = i
-    state[name].Name      = name
-    state[name].Title     = title
-    state[name].Notes     = notes
-    state[name].Loadable  = loadable
-    state[name].Reason    = reason
-    state[name].Security  = security
-    state[name].Installed = true
-    state[name].Enabled   = enabledState
+    Core:debug("state: " .. name .. ", enabledState: " .. enabledState)
+    state[name] = {
+      Index     = i,
+      Name      = name,
+      Title     = title,
+      Notes     = notes,
+      Loadable  = loadable,
+      Reason    = reason,
+      Security  = security,
+      Installed = true,
+      Enabled   = enabledState
+    }
   end
 
   Core.CurrentState = state
 end
 
-function LoadAddOnTemplates()
+function Core:LoadAddOnTemplates()
   Core.Templates = AddOnTemplates
 
   -- If there isn't an existing saved template, create one from the existing
   -- state.
-  if not Templates then
+  if not Core.Templates then
+    Core:debug("Core.Templates = nil")
     Core.Templates = {}
+  end
 
-    local template = newTemplate()
+  if Core.Templates == {} then
+    Core:debug("Core.Templates = {}")
+    local template = Core:newTemplate()
 
     -- If all addons are disabled, return an empty template.
-    if Core.CurrentStateEnabledment == 0 then
-      Core.Templates[Core.TEMPLATE_DEFAULT] = {}
+    if Core.CurrentStateEnablement == 0 then
+      Core.Templates[Core.DEFAULT_TEMPLATE] = {}
       return
     end
 
@@ -60,9 +79,9 @@ function LoadAddOnTemplates()
     -- If there are character level addon toggles, then the default template
     -- should include the characters name.
     if Core.CurrentStateEnablement == 1 then
-      name = serverDefaultName()
+      name = Core:serverDefaultName()
     else
-      name = Core.TEMPLATE_DEFAULT
+      name = Core.DEFAULT_TEMPLATE
     end
 
     Core.Templates[name] = template
@@ -72,21 +91,27 @@ function LoadAddOnTemplates()
 
   -- This assumes we've found some existing templates. We're going to loop through
   -- them and ensure that all templates are marked "Installed" correctly.
-  local state = AddOnState()
   for tname, template in pairs(Core.Templates) do
+    Core:debug("Core.Templates: " .. tname)
     for aname, addon in pairs(template) do
-      if not state[aname] then
+      Core:debug("Core.Templates: " .. tname .. " " .. aname)
+      if not Core.CurrentState[aname] then
         Core.Templates[tname][aname].Installed = false
+        Core:debug("Core.Templates: " .. tname .. " " .. aname .. " IS MISSING")
+      else
+        for k, v in pairs(Core.CurrentState[aname]) do
+          Core:debug("Core.Templates:" .. tname .. " " .. aname .. " " .. k .. " " .. tostring(v))
+        end
       end
     end
   end
 end
 
-function LoadAddOnsTemplate(tname)
+function Core:LoadAddOnsTemplate(tname)
   if not tname then
-    tname = Core.TEMPLATE_DEFAULT
+    tname = Core.DEFAULT_TEMPLATE
     if not Core.Templates[tname] then
-      tname = serverDefaultName()
+      tname = Core:serverDefaultName()
     end
   end
 
@@ -99,16 +124,16 @@ function LoadAddOnsTemplate(tname)
 
   for _, addon in Core.Templates[tname] do
     if not addon.Installed then
-      warn(addon.Name .. " from " .. tname .. " template, is no longer installed.")
+      Core.warn(addon.Name .. " from " .. tname .. " template, is no longer installed.")
     elseif not addon.Loadable then
-      warn(addon.Name .. " from " .. tname .. " template, not loadable (Reason: " .. addon.Reason .. ").")
+      Core.warn(addon.Name .. " from " .. tname .. " template, not loadable (Reason: " .. addon.Reason .. ").")
     else
-      EnabledAddOn(addon.Name)
+      EnableAddOn(addon.Name, Core.GlobalAddOnState)
     end
   end
 end
 
-function SaveAddOnsTemplate(tname)
+function Core:SaveAddOnsTemplate(tname)
   if not tname then
     if Core.CurrentState == 1 then
       tname = Core.Character .. "@Default"
@@ -118,11 +143,15 @@ function SaveAddOnsTemplate(tname)
   end
 end
 
-local function newTemplate()
+-- Locals'ish, but not really
+function Core:newTemplate()
   local template = {}
 
-  local state = AddOnState()
-  for _, addon in pairs(state) do
+  if not Core.CurrentState then
+    return {}
+  end
+
+  for _, addon in pairs(Core.CurrentState) do
     if addon.Enabled > 0 then
       template[addon.Name] = addon
     end
@@ -131,21 +160,26 @@ local function newTemplate()
   return template
 end
 
--- Locals
-local function warn(str)
-  msg("WARNING", str)
+function Core:warn(str)
+  Core:msg("WARNING", str)
 end
 
-local function err(str)
-  msg("ERROR", str)
+function Core:debug(str)
+  if Core.DEBUG then
+    Core:msg("DEBUG", str)
+  end
 end
 
-local function msg(t, str)
+function Core:err(str)
+  Core:msg("ERROR", str)
+end
+
+function Core:msg(t, str)
   print(Core.ADDON_NAME .. ": [" .. t .. "] " .. str)
 end
 
-local function serverDefaultName()
-  return Core.Character .. "@" .. Core.TEMPLATE_DEFAULT
+function Core:serverDefaultName()
+  return Core.Character .. "@" .. Core.DEFAULT_TEMPLATE
 end
 
 return Core
