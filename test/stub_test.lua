@@ -8,7 +8,7 @@ TestStubs = {} --class
 
   function TestStubs:test_wowstubs_AddOnTemplates()
     lu.assertFalse(AddOnTemplates == nil)
-    lu.assertFalse(AddOnTemplates == {})
+    lu.assertFalse(next(AddOnTemplates) == nil)
   end
 
   function TestStubs:test_wowstubs_GetAddOnInfo()

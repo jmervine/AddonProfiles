@@ -5,6 +5,7 @@ lu = require('libs.luaunit')
 -- files.
 require('test.stub_test')
 require('test.core_test')
+require('test.cmds_test')
 
 -- EXEC
 local runner = lu.LuaUnit.new()

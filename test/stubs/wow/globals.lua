@@ -1,5 +1,7 @@
 require('test.stubs.wow.SavedVariables')
 
+SlashCmdList = {}
+
 wowAddOnsStub = {
   [1] = {
     name     = "TestAddOn_One",
@@ -96,6 +98,6 @@ function DisableAddOn(aname, _)
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_DisableAllAddOns
-function DisableAllOns()
+function DisableAllAddOns()
   wowAddOnsEnabled = {}
 end
