@@ -17,15 +17,18 @@ releases:
 	mkdir -p releases
 
 release: releases
-	zip releases/AddonTemplates.zip \
-		AddOnTemplates.toc \
-		init.lua \
-		README.md \
-		cmds/* \
-		core/* \
-		libs/* \
-	&& mv releases/AddonTemplates.zip releases/AddonTemplates-$(shell cat ./VERSION).zip \
-	&& git commit -a -m "Release $(shell cat ./VERSION)." \
-	&& git tag -f $(shell cat ./VERSION)
+	mkdir -p releases/AddOnTemplates
+	cp -vr ./AddOnTemplates.toc releases/AddOnTemplates/
+	cp -vr ./init.lua releases/AddOnTemplates/
+	cp -vr ./README.md releases/AddOnTemplates/
+	cp -vr ./cmds releases/AddOnTemplates/
+	cp -vr ./core releases/AddOnTemplates/
+	mkdir -p releases/AddOnTemplates/libs
+	cp -vr ./libs/helpers.lua releases/AddOnTemplates/libs/
+	cd releases \
+		&& zip AddOnTemplates-$(shell cat ./VERSION).zip AddOnTemplates/**/* \
+		&& rm -rf AddOnTemplates
+	git commit -a -m "Release $(shell cat ./VERSION)."
+	git tag -f $(shell cat ./VERSION)
 
 .PHONY: test ci release
