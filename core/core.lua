@@ -114,13 +114,6 @@ function Core:LoadAddOnTemplates()
 end
 
 function Core:LoadAddOnsTemplate(tname)
-  if not tname then
-    tname = Core.DEFAULT_TEMPLATE
-    if not Core.Templates[tname] then
-      tname = Core:characterDefaultName()
-    end
-  end
-
   if not Core.Templates[tname] then
     helpers:Error(tname .. " template, does not exist.")
     return
@@ -140,14 +133,6 @@ function Core:LoadAddOnsTemplate(tname)
 end
 
 function Core:SaveAddOnsTemplate(tname)
-  if not tname then
-    if Core.CurrentStateEnablement == 1 then
-      tname = Core.Character .. "@Default"
-    else
-      tname = "Default"
-    end
-  end
-
   local template = Core.Templates[tname]
   if not template then
     Core.Templates[tname] = {}

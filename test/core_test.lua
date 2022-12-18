@@ -31,14 +31,6 @@ TestCore = {} --class
     lu.assertEquals(core.CurrentState[addon].Name, addon)
   end
 
-  function TestCore:test_LoadAddOnTemplates_withAddOnTemplates()
-    lu.assertEquals(core.Templates, AddOnTemplates)
-
-    local addon = core.Templates["Default"]["TestAddOn_One"]
-    lu.assertEquals(addon.Name, "TestAddOn_One")
-    lu.assertTrue(addon.Installed)
-  end
-
   function TestCore:test_loadTemplates_withPreviouslySaved()
     -- Depends on the call to the public "core:LoadAddOnTemplates()" function
     -- within the "core:Inititalize()" function, however, we're only testing
@@ -81,4 +73,17 @@ TestCore = {} --class
     local default = core.Templates["Default"]
     lu.assertFalse(default == nil)
     lu.assertFalse(next(default) == nil)
+  end
+
+  function TestCore:test_LoadAddOnsTemplate()
+    core:LoadAddOnsTemplate("Default")
+
+    lu.assertFalse(core.CurrentState["TestAddOn_One"] == nil)
+
+    local found = false
+    for _, v in ipairs(wowAddOnsEnabled) do
+      found = (name == "TestAddOn_Two")
+      if found then break end
+    end
+    lu.assertFalse(found)
   end
