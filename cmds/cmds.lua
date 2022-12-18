@@ -1,7 +1,4 @@
-local helpers = require('libs.helpers')
-local core    = require('core.core')
-
-local Cmds    = {} -- Class
+Cmds = {} -- Class
   Cmds.commands = {
     "addontemplates",
     "at",
@@ -9,7 +6,7 @@ local Cmds    = {} -- Class
   }
 
   -- --------------------------------------------------------------------------
-  -- Define command actions and helpers.
+  -- Define command actions and Helpers.
   local function _helpCmd(value)
     local cmds = table.concat(Cmds.commands, ", ")
 
@@ -22,13 +19,13 @@ local Cmds    = {} -- Class
         break
       end
 
-      local t = "/%s %s %s: %s"
-      helpers:Print(string.format(t, cmd, c, info["usage"], info["description"]))
+      local t = "/%s %s %s. %s"
+      Helpers.Print(string.format(t, cmd, c, info["usage"], info["description"]))
     end
 
-    helpers:Print("Slash command aliases: " .. cmds .. ":")
+    Helpers.Print("Slash command aliases. " .. cmds .. ".")
     if not value or value == "" then
-      helpers:Print("Subcommands:")
+      Helpers.Print("Subcommands.")
       for cmd, _ in pairs(Cmds.subcommands) do
         ptrSubcmd(cmd)
       end
@@ -39,7 +36,7 @@ local Cmds    = {} -- Class
   end
 
   local function _nilValue(cmd)
-    helpers:Error(string.format("'%s' function missing a required TEMPLATE!", cmd))
+    Helpers.Error(string.format("'%s' function missing a required TEMPLATE!", cmd))
     _helpCmd(cmd)
   end
 
@@ -49,23 +46,23 @@ local Cmds    = {} -- Class
       return
     end
 
-    core:LoadAddOnsTemplate(value)
-    helpers:Print(string.format("'%s' loaded, type /reload to activate it, otherwise it will be active with your next login.", value))
+    Core.LoadAddOnsTemplate(value)
+    Helpers.Print(string.format("'%s' loaded, type /reload to activate it, otherwise it will be active with your next login.", value))
   end
 
   local function _showCmd(value)
     if not value then value = "" end
 
-    for tname, template in pairs(core.Templates) do
+    for tname, template in pairs(Core.Templates) do
       if value == "" or value == tname then
         local addons = {}
         for aname, _ in pairs(template) do
           table.insert(addons, aname)
         end
 
-        local t = "Template: %s, AddOns: %s"
-        helpers:Print("Template: " .. tname)
-        helpers:Print("  AddOns: " .. table.concat(addons, ", "))
+        local t = "Template. %s, AddOns. %s"
+        Helpers.Print("Template. " .. tname)
+        Helpers.Print("  AddOns. " .. table.concat(addons, ", "))
       end
     end
   end
@@ -76,8 +73,8 @@ local Cmds    = {} -- Class
       return
     end
 
-    core:SaveAddOnsTemplate(value)
-    helpers:Print(string.format("'%s' saved.", value))
+    Core.SaveAddOnsTemplate(value)
+    Helpers.Print(string.format("'%s' saved.", value))
   end
 
   local function _removeCmd(value)
@@ -86,7 +83,7 @@ local Cmds    = {} -- Class
       return
     end
 
-    core:RemoveAddOnsTemplate(value)
+    Core.RemoveAddOnsTemplate(value)
   end
 
   -- --------------------------------------------------------------------------
@@ -121,14 +118,14 @@ local Cmds    = {} -- Class
 
   -- --------------------------------------------------------------------------
   -- Class Functions
-  function Cmds:Initialize()
+  function Cmds.Initialize()
     for _, command in ipairs(Cmds.commands) do
       initCommand(command)
     end
   end
 
   function initCommand(command)
-    helpers:Debug("Initialize command: " .. command)
+    Helpers.Debug("Initialize command. " .. command)
 
     SlashCmdList[command] = exec
   end
@@ -146,8 +143,6 @@ local Cmds    = {} -- Class
     if subcmd == nil then subcmd = "help" end
     if value == nil  then value = ""      end
 
-    helpers:Debug("subcmd: '" .. subcmd .. "', value: '" .. value .. "'")
+    Helpers.Debug("subcmd. '" .. subcmd .. "', value. '" .. value .. "'")
     Cmds.subcommands[subcmd]["action"](value)
   end
-
-return Cmds

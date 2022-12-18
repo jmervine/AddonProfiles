@@ -1,21 +1,17 @@
-#!/usr/bin/env lua
-local helpers = require('libs.helpers')
-local cmds    = require('cmds.cmds')
-
 TestCmds = {} -- class
   local function runSlashCmd(action, value)
-    helpers:Debug(action)
+    Helpers.Debug(action)
     SlashCmdList["at"](action, value)
   end
 
   function TestCmds:setUp()
-    cmds:Initialize()
+    Cmds.Initialize()
   end
 
   function TestCmds:test_no_command()
     local called = false
 
-    cmds.subcommands["help"]["action"] = function()
+    Cmds.subcommands["help"]["action"] = function()
       called = true
     end
 
@@ -26,7 +22,7 @@ TestCmds = {} -- class
   function TestCmds:test_help()
     local called = false
 
-    cmds.subcommands["help"]["action"] = function()
+    Cmds.subcommands["help"]["action"] = function()
       called = true
     end
 

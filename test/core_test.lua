@@ -1,41 +1,38 @@
-#!/usr/bin/env lua
-local core = require('core.core')
-
 TestCore = {} --class
   TestCore.addOnTemplatesBackup = nil
   TestCore.currentStateBackup = nil
 
   local function zeroAddOnTemplates()
     AddOnTemplates = nil
-    core.Templates = nil
+    Core.Templates = nil
   end
 
   function TestCore:setUp()
     -- setups
-    core:Initialize()
+    Core.Initialize()
 
     TestCore.addOnTemplatesBackup = AddOnTemplates
-    TestCore.currentStateBackup   = core.CurrentState
+    TestCore.currentStateBackup   = Core.CurrentState
   end
 
   function TestCore:tearDown()
     AddOnTemplates    = TestCore.addOnTemplatesBackup
-    core.CurrentState = TestCore.currentStateBackup
+    Core.CurrentState = TestCore.currentStateBackup
   end
 
   function TestStubs:test_SetAddOnState()
     local addon = "TestAddOn_One"
 
-    lu.assertFalse(core.CurrentState[addon] == nil)
-    lu.assertFalse(next(core.CurrentState[addon]) == nil)
-    lu.assertEquals(core.CurrentState[addon].Name, addon)
+    lu.assertFalse(Core.CurrentState[addon] == nil)
+    lu.assertFalse(next(Core.CurrentState[addon]) == nil)
+    lu.assertEquals(Core.CurrentState[addon].Name, addon)
   end
 
   function TestCore:test_loadTemplates_withPreviouslySaved()
     -- Depends on the call to the public "core:LoadAddOnTemplates()" function
     -- within the "core:Inititalize()" function, however, we're only testing
     -- logic within 'local function loadTemplates'.
-    local name = core.Templates["Default"]["TestAddOn_One"].Name
+    local name = Core.Templates["Default"]["TestAddOn_One"].Name
     lu.assertEquals(name, "TestAddOn_One")
   end
 
@@ -46,10 +43,10 @@ TestCore = {} --class
     -- Store AddOnTempaltes for later reset.
     zeroAddOnTemplates()
 
-    core.LoadAddOnTemplates()
+    Core.LoadAddOnTemplates()
 
     -- actual tests
-    local name = core.Templates["Default"]["TestAddOn_One"].Name
+    local name = Core.Templates["Default"]["TestAddOn_One"].Name
     lu.assertEquals(name, "TestAddOn_One")
   end
 
@@ -58,27 +55,27 @@ TestCore = {} --class
     -- within 'local function loadTemplates'.
 
     -- Set installed to false for testing. Will be reset by tearDown.
-    core.CurrentState = {
+    Core.CurrentState = {
       ["TestAddOn_One"] = TestCore.currentStateBackup["TestAddOn_One"]
     }
 
-    core.LoadAddOnTemplates()
+    Core.LoadAddOnTemplates()
 
-    lu.assertFalse(core.Templates["TestCharacter@Raiding"]["TestAddOn_Two"].Installed)
+    lu.assertFalse(Core.Templates["TestCharacter@Raiding"]["TestAddOn_Two"].Installed)
   end
 
   function TestCore:test_LoadAddOnTemplates()
-    lu.assertEquals(core.CurrentStateEnablement, 2) -- TODO: Need more tests around this.
+    lu.assertEquals(Core.CurrentStateEnablement, 2) -- TODO: Need more tests around this.
 
-    local default = core.Templates["Default"]
+    local default = Core.Templates["Default"]
     lu.assertFalse(default == nil)
     lu.assertFalse(next(default) == nil)
   end
 
   function TestCore:test_LoadAddOnsTemplate()
-    core:LoadAddOnsTemplate("Default")
+    Core.LoadAddOnsTemplate("Default")
 
-    lu.assertFalse(core.CurrentState["TestAddOn_One"] == nil)
+    lu.assertFalse(Core.CurrentState["TestAddOn_One"] == nil)
 
     local found = false
     for _, v in ipairs(wowAddOnsEnabled) do
@@ -89,8 +86,8 @@ TestCore = {} --class
   end
 
   function TestCore:test_SaveAddOnsTemplate()
-    core:SaveAddOnsTemplate("TestNew")
+    Core.SaveAddOnsTemplate("TestNew")
 
-    lu.assertFalse(not core.Templates["TestNew"])
+    lu.assertFalse(not Core.Templates["TestNew"])
     lu.assertFalse(not AddOnTemplates["TestNew"])
   end

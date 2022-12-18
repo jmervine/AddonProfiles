@@ -1,5 +1,10 @@
+#!/usr/bin/env lua
 require('test.stubs.wow.globals')
 lu = require('libs.luaunit')
+
+require('libs.helpers')
+require('core.core')
+require('cmds.cmds')
 
 -- Right now, this requires that you manually add any new testing
 -- files.
