@@ -13,4 +13,19 @@ ci:
 	docker build -t jmervine/addontemplates:test -f Dockerfile.test .
 	docker run -t jmervine/addontemplates:test
 
-.PHONY: test ci
+releases:
+	mkdir -p releases
+
+release: releases
+	zip releases/AddonTemplates.zip \
+		AddOnTemplates.toc \
+		init.lua \
+		README.md \
+		cmds/* \
+		core/* \
+		libs/* \
+	&& mv releases/AddonTemplates.zip releases/AddonTemplates-$(shell cat ./VERSION).zip \
+	&& git commit -a -m "Release $(shell cat ./VERSION)." \
+	&& git tag -f $(shell cat ./VERSION)
+
+.PHONY: test ci release
