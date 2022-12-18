@@ -1,0 +1,5 @@
+FROM woahbase/alpine-lua:latest
+
+COPY . /src
+WORKDIR /src
+ENTRYPOINT lua ./test/test.lua

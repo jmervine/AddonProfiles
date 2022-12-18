@@ -9,4 +9,8 @@ libs:
 libs/luaunit.lua: libs
 	curl -s https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua > libs/luaunit.lua
 
-.PHONY: test
+ci:
+	docker build -t jmervine/addontemplates:test -f Dockerfile.test .
+	docker run -t jmervine/addontemplates:test
+
+.PHONY: test ci
