@@ -87,3 +87,10 @@ TestCore = {} --class
     end
     lu.assertFalse(found)
   end
+
+  function TestCore:test_SaveAddOnsTemplate()
+    core:SaveAddOnsTemplate("TestNew")
+
+    lu.assertFalse(not core.Templates["TestNew"])
+    lu.assertFalse(not AddOnTemplates["TestNew"])
+  end
