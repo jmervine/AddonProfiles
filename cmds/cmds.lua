@@ -1,9 +1,5 @@
 Cmds = {} -- Class
-  Cmds.commands = {
-    "addontemplates",
-    "at",
-    "addons"
-  }
+  Cmds.commands = { "addontemplates",, "at", "addons" }
 
   -- --------------------------------------------------------------------------
   -- Define command actions and Helpers.
@@ -118,31 +114,6 @@ Cmds = {} -- Class
 
   -- --------------------------------------------------------------------------
   -- Class Functions
-  function Cmds.Initialize()
-    for _, command in ipairs(Cmds.commands) do
-      initCommand(command)
-    end
-  end
-
-  function initCommand(command)
-    Helpers.Debug("Initialize command. " .. command)
-
-    SlashCmdList[command] = exec
-  end
-
-  function exec(subcmd, value)
-    if subcmd == nil then
-      execCommand("help", "")
-      return
-    end
-
-    execCommand(subcmd, value)
-  end
-
-  function execCommand(subcmd, value)
-    if subcmd == nil then subcmd = "help" end
-    if value == nil  then value = ""      end
-
-    Helpers.Debug("subcmd. '" .. subcmd .. "', value. '" .. value .. "'")
+  function Cmds.execCommand(subcmd, value)
     Cmds.subcommands[subcmd]["action"](value)
   end

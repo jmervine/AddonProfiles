@@ -6,6 +6,8 @@ require('libs.helpers')
 require('core.core')
 require('cmds.cmds')
 
+Helpers.DEBUG = (os.getenv("DEBUG") == "true")
+
 -- Right now, this requires that you manually add any new testing
 -- files.
 require('test.stub_test')

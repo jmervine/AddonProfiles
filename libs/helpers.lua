@@ -1,5 +1,5 @@
 Helpers = {} --Class
-  Helpers.DEBUG = (os.getenv("DEBUG") == "true")
+  Helpers.DEBUG = true 
 
   -- ADDON_NAME. AddOnTemplates
   Helpers.ADDON_NAME = "AddOnTemplates"
@@ -25,5 +25,21 @@ Helpers = {} --Class
   end
 
   function Helpers.Print(str)
-    print(Helpers.ADDON_NAME .. ". " .. str)
+    DEFAULT_CHAT_FRAME:AddMessage("[" .. Helpers.ADDON_NAME .. "] " .. str)
+  end
+
+  function Helpers.SplitString(s, delimiter)
+    result = {};
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+      table.insert(result, match);
+    end
+    return result;
+  end
+
+  function Helpers.TableLen(t)
+    local l = 0
+    for _ in pairs(t) do
+      l = l + 1
+    end
+    return l
   end

@@ -7,7 +7,5 @@
 ## Interface: 30400
 ## X-Interface: 30400
 
-libs/helpers.lua
-core/core.lua
-core/cmds.lua
-init.lua
+embeds.xml
+Core.lua
