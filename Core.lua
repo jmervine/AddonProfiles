@@ -143,7 +143,7 @@ function AddOnTemplates:Load(input)
   if not requested then
     self:Print("ERROR Unknown template.")
     self:Print(" ")
-    self:Show()
+    self:ShowAll()
   end
 
   if current == requested then
@@ -229,14 +229,14 @@ function AddOnTemplates:Delete(input)
   if not requested then
     self:Print("ERROR Unknown template.")
     self:Print(" ")
-    self:Show()
+    self:ShowAll()
   end
 
   local removed = self:deleteTemplate(input)
 
   self:Print(" ")
   if removed then
-    self:Show()
+    self:ShowAll()
   else
     self:Printf("No templates were removed.")
   end
