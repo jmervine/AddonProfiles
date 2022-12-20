@@ -88,10 +88,10 @@ function AddOnTemplates:SlashHandler(input)
 end
 
 function AddOnTemplates:Help()
-  self:Printf("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '"))
+  self:Print(string.format("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '")))
 
   for cmd, cfg in pairs(self.HelpMessages) do
-    self:Printf("  '%s %s': %s", cmd, cfg.opts, cfg.desc)
+    self:Print(string.format("  '%s %s': %s", cmd, cfg.opts, cfg.desc))
   end
 
   return
@@ -142,6 +142,8 @@ function AddOnTemplates:Load(input)
   end
 
   self:Printf("Loaded: '%s': %s", input, table.concat(requested, ", "))
+
+  --ReloadUI()
   self:Printf(" ")
   self:Printf("Type '/reload' to activate AddOns.")
 

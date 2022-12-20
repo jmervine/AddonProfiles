@@ -12,5 +12,11 @@ mind and the focused test environment.
 
 ## Usage
 ```
--- TODO
+[AddOnTemplates] Usage: /addontemplates [option] (aliases: 'at', 'addons')
+[AddOnTemplates]   'load TEMPLATE': Load saved 'TEMPLATE'.
+[AddOnTemplates]   'show ': Show saved templates.
+[AddOnTemplates]   'delete TEMPLATE': Delete saved 'TEMPLATE'.
+[AddOnTemplates]   'addons ': List currently enabled AddOns.
+[AddOnTemplates]   'help [SUBCOMMAND]': Show help message.
+[AddOnTemplates]   'save TEMPLATE': Saved current AddOn state as 'TEMPLATE'.
 ```
