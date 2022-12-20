@@ -10,3 +10,4 @@
 embeds.xml
 
 Core.lua
+Libs/AddOnTemplates/UI.lua
