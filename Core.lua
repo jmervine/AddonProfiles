@@ -171,11 +171,9 @@ function AddOnTemplates:getAddOns()
 
   for i=1, GetNumAddOns(), 1 do
     local name, _, _, loadable, _, _, _ = GetAddOnInfo(i)
-    if loadable then
-      local state = GetAddOnEnableState(nil, name)
-      if state > 0 then
-        table.insert(addons, name)
-      end
+    local state = GetAddOnEnableState(nil, name)
+    if state > 0 or loadable then
+      table.insert(addons, name)
     end
   end
 

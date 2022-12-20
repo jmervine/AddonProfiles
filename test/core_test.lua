@@ -38,7 +38,7 @@ TestCore = {} --class
 
   function TestCore:test_getAddOns()
     local addons = AddOnTemplates:getAddOns()
-    lu.assertEquals(addons, { "TestAddOn_One" })
+    lu.assertEquals(addons, { "TestAddOn_One", "TestAddOn_Two" })
   end
 
   function TestCore:test_saveAddOnTemplate()

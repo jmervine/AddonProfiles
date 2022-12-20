@@ -23,10 +23,10 @@ TestStubs = {} --class
 
   function TestStubs:test_wowstubs_DisableAddOn()
     DisableAddOn("TestAddOn_Two")
-    lu.assertEquals(GetAddOnEnableState(nil, "TestAddOn_One"), 0)
+    lu.assertEquals(GetAddOnEnableState(nil, "TestAddOn_Two"), 0)
   end
 
   function TestStubs:test_wowstubs_GetNumAddOns()
-    lu.assertEquals(GetNumAddOns(), 2)
+    lu.assertEquals(GetNumAddOns(), 3)
   end
 
