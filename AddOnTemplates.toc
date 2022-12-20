@@ -2,10 +2,12 @@
 ## Notes: Manage AddOn Enabled / Disabled state
 ## Author: Hound
 ## Version: 0.1
-## SavedVariables: AddOnTemplates
-## SavedVariablesPerCharacter: AddOnTemplates
+## SavedVariables: AddOnTemplatesStore
+## SavedVariablesPerCharacter: AddOnTemplatesStore
+## OptionalDeps: Ace3
 ## Interface: 30400
 ## X-Interface: 30400
 
 embeds.xml
+
 Core.lua

@@ -1,13 +1,13 @@
 lauunit ?= "https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua"
 
-test: libs/luaunit.lua
+test: Libs/LUAUnit/luaunit.lua
 	lua ./test/test.lua
 
-libs:
-	make -p libs
+Libs/LUAUnit:
+	make -p Libs/LUAUnit
 
-libs/luaunit.lua: libs
-	curl -s https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua > libs/luaunit.lua
+Libs/LUAUnit/luaunit.lua: Libs/LUAUnit
+	curl -s https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua > Libs/LUAUnit/luaunit.lua
 
 ci:
 	docker build -t jmervine/addontemplates:test -f Dockerfile.test .
@@ -18,13 +18,13 @@ releases:
 
 release: releases
 	mkdir -p releases/AddOnTemplates
-	cp -vr ./AddOnTemplates.toc releases/AddOnTemplates/
-	cp -vr ./init.lua releases/AddOnTemplates/
-	cp -vr ./README.md releases/AddOnTemplates/
-	cp -vr ./cmds releases/AddOnTemplates/
-	cp -vr ./core releases/AddOnTemplates/
-	mkdir -p releases/AddOnTemplates/libs
-	cp -vr ./libs/helpers.lua releases/AddOnTemplates/libs/
+	cp -vr ./*.toc releases/AddOnTemplates/
+	cp -vr ./*.lua releases/AddOnTemplates/
+	cp -vr ./*.xml releases/AddOnTemplates/
+	cp -vr ./*.md releases/AddOnTemplates/
+	cp -vr ./VERSION releases/AddOnTemplates/
+	cp -vr ./Libs releases/AddOnTemplates/
+	rm -r  ./releases/AddOnTemplates/Libs/LUAUnit
 	cd releases \
 		&& zip AddOnTemplates-$(shell cat ./VERSION).zip AddOnTemplates/**/* \
 		&& rm -rf AddOnTemplates
