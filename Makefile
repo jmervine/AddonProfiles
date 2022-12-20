@@ -1,5 +1,3 @@
-lauunit ?= "https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua"
-
 test: Libs/LUAUnit/luaunit.lua
 	lua ./test/test.lua -v
 
@@ -15,9 +13,5 @@ ci:
 
 releases:
 	mkdir -p releases
-
-release: releases
-	-git commit -a -m "Release $(shell cat ./VERSION)."
-	git tag -f $(shell cat ./VERSION)
 
 .PHONY: test ci release
