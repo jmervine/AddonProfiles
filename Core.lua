@@ -1,6 +1,6 @@
-ADDON_NAME = "AddOnTemplates"
 
-AddOnTemplates = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0")
+AddOnTemplates = LibStub("AceAddon-3.0"):NewAddon("AddOnTemplates", "AceConsole-3.0")
+AddOnTemplates.ADDON_NAME = "AddOnTemplates"
 AddOnTemplates.DefaultTemplate = string.format("%s@Default", UnitName("player"))
 
 function AddOnTemplates:OnInitialize()
@@ -9,6 +9,12 @@ function AddOnTemplates:OnInitialize()
       [self.DefaultTemplate] = self:getAddOns()
     }
   end
+
+  if self.LibsUI then
+    self:InitializeUI()
+  end
+
+  self:Print("Welcome! Type '/addontemplates' to get started.")
 end
 
 
@@ -41,8 +47,7 @@ AddOnTemplates.HelpMessages = {
     opts = "TEMPLATE"
   }
 }
-
-AddOnTemplates:Print("Welcome! Use '/addontemplates help' to see available options.")
+table.sort(AddOnTemplates.HelpMessages)
 
 AddOnTemplates:RegisterChatCommand(AddOnTemplates.SlashCommands, "SlashHandler")
 for _, c in ipairs(AddOnTemplates.SlashAliases) do
@@ -92,11 +97,7 @@ function AddOnTemplates:SlashHandler(input)
 end
 
 function AddOnTemplates:Help()
-  self:Print(string.format("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '")))
-
-  for cmd, cfg in pairs(self.HelpMessages) do
-    self:Print(string.format("  '%s %s': %s", cmd, cfg.opts, cfg.desc))
-  end
+  self:OpenOptions()
 
   return
 end
@@ -239,31 +240,4 @@ function AddOnTemplates:Delete(input)
   end
 
   return
-end
-
-function AddOnTemplates:ReloadUI()
-  local dia = "ADDON_TEMPLATES_RELOAD_UI"
-  if not StaticPopupDialogs[dia] then
-    self:buildReloadUI()
-  end
-  StaticPopup_Show(dia)
-end
-
-function AddOnTemplates:buildReloadUI()
-  StaticPopupDialogs["ADDON_TEMPLATES_RELOAD_UI"] = {
-    text = "Reload UI?",
-    button1 = "Reload",
-    button2 = "Cancel",
-    OnAccept = function()
-        ReloadUI()
-    end,
-    OnCancel = function()
-      AddOnTemplates:Printf(" ")
-      AddOnTemplates:Printf("Type '/reload' to activate AddOns.")
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3 -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
-  }
 end

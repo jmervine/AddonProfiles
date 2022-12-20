@@ -6,8 +6,9 @@ loadfile("Libs/AceConsole-3.0/AceConsole-3.0.lua")()
 loadfile("Libs/AceAddon-3.0/AceAddon-3.0.lua")()
 require("Core")
 
-function AddOnTemplates:Print(str)
-  print(string.format("[%s] %s", ADDON_NAME, str))
-end
+local this = AddOnTemplates
+print(string.format("Usage: /%s [option] (aliases: '%s')", this.SlashCommands, table.concat(this.SlashAliases, "', '")))
 
-AddOnTemplates:Help()
+for cmd, cfg in pairs(this.HelpMessages) do
+  print(string.format("  '%s %s': %s", cmd, cfg.opts, cfg.desc))
+end
