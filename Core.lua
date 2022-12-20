@@ -98,11 +98,6 @@ end
 
 function AddOnTemplates:Help()
   self:OpenOptions()
-  -- self:Print(string.format("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '")))
-
-  -- for cmd, cfg in pairs(self.HelpMessages) do
-  --   self:Print(string.format("  '%s %s': %s", cmd, cfg.opts, cfg.desc))
-  -- end
 
   return
 end
