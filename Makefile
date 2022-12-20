@@ -17,7 +17,7 @@ releases:
 	mkdir -p releases
 
 release: releases
-	git commit -a -m "Release $(shell cat ./VERSION)."
+	-git commit -a -m "Release $(shell cat ./VERSION)."
 	git tag -f $(shell cat ./VERSION)
 
 .PHONY: test ci release
