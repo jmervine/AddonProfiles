@@ -4,24 +4,34 @@ SlashCmdList = {}
 
 wowAddOnsStub = {
   [1] = {
+    _enabled = true, -- non-Bliz public state, using for testing.
     name     = "TestAddOn_One",
     title    = "Test AddOn Sub #1",
     notes    = "Test AddOn Sub #1 Note",
-    loadable = true,
+    loadable = 1,
     reason   = nil,
-    security = "SECURITY: Not sure what's the for and I'm not using it."
+    security = "INSECURE" -- default for all non Bliz addons
   },
   [2] = {
+    _enabled = false, -- non-Bliz public state, using for testing.
     name     = "TestAddOn_Two",
     title    = "Test AddOn Sub #2",
     notes    = "Test AddOn Sub #2 Note",
-    loadable = true,
+    loadable = 1,
     reason   = nil,
-    security = "SECURITY: Not sure what's the for and I'm not using it."
+    security = "INSECURE" -- default for all non Bliz addons
+  },
+  [3] = {
+    _enabled = false, -- non-Bliz public state, using for testing.
+    name     = "TestAddOn_Three",
+    title    = "Test AddOn Sub #3",
+    notes    = "Test AddOn Sub #3 Note",
+    loadable = nil,
+    reason   = "MISSING",
+    security = "INSECURE" -- default for all non Bliz addons
   }
 }
 
-wowAddOnsEnabled = { "TestAddOn_One" }
 wowAddOnTemplates = {
   ["Default"] = { "TestAddOn_One" },
   ["TestCharacter@Raiding"] = {
@@ -57,8 +67,8 @@ end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnEnableState
 function GetAddOnEnableState(_, a)
-  for _, aname in pairs(wowAddOnsEnabled) do
-    if aname == a then
+  for i, addon in pairs(wowAddOnsStub) do
+    if (addon.name == a or i == a) and (addon._enabled or addon.loadable) then
       return 2
     end
   end
@@ -82,24 +92,29 @@ end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_EnableAddOn
 function EnableAddOn(aname, _)
-  table.insert(wowAddOnsEnabled, aname)
+  for i, addon in pairs(wowAddOnsStub) do
+    if addon.name == aname or i == aname then
+      wowAddOnsStub[i]._enabled = true
+      wowAddOnsStub[i].loadable = 1
+    end
+  end
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_DisableAddOn
 function DisableAddOn(aname, _)
-  local t = {}
-  for _, v in pairs(wowAddOnsEnabled) do
-    if v == aname then
-      table.insert(t, v)
+  for i, addon in pairs(wowAddOnsStub) do
+    if addon.name == aname or i == aname then
+      wowAddOnsStub[i]._enabled = false
+      wowAddOnsStub[i].loadable = false
     end
   end
-
-  wowAddOnsEnabled = t
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_DisableAllAddOns
 function DisableAllAddOns()
-  wowAddOnsEnabled = {}
+  for i, _ in pairs(wowAddOnsStub) do
+    wowAddOnsStub[i]._enabled = false
+  end
 end
 
 -- support ace

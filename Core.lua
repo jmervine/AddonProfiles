@@ -25,8 +25,8 @@ AddOnTemplates.HelpMessages = {
     opts = ""
   },
   ["show"] = {
-    desc = "Show saved templates.",
-    opts = ""
+    desc = "Show saved template or templates.",
+    opts = "[TEMPLATE]"
   },
   ["load"] = {
     desc = "Load saved 'TEMPLATE'.",
@@ -60,7 +60,7 @@ function AddOnTemplates:SlashHandler(input)
   if input == "help" then
     self:Help()
   elseif input == "show" then
-    self:Show()
+    self:ShowAll()
   elseif input == "addons" then
     self:AddOns()
   elseif input == "save" then
@@ -76,6 +76,8 @@ function AddOnTemplates:SlashHandler(input)
 
     if cmd == "load" then
       self:Load(input)
+    elseif cmd == "show" then
+      self:ShowOne(input)
     elseif cmd == "save" then
       self:Save(input)
     elseif cmd == "delete" then
@@ -99,7 +101,20 @@ function AddOnTemplates:Help()
   return
 end
 
-function AddOnTemplates:Show()
+function AddOnTemplates:ShowOne(template)
+  local addons = AddOnTemplatesStore[template]
+
+  if addons == nil then
+    self:Printf("Template %s not found.", template)
+    return
+  end
+
+  self:Printf("Template: %s", template)
+  local astr = table.concat(addons, ", ")
+  self:Printf(" %s", astr)
+end
+
+function AddOnTemplates:ShowAll()
   local store = AddOnTemplatesStore
   self:Print("Templates:")
 
@@ -108,9 +123,8 @@ function AddOnTemplates:Show()
     return
   end
 
-  for i, v in pairs(store) do
-    local a = table.concat(v, ", ")
-    self:Printf(" - '%s': %s", i, a)
+  for tname, _ in pairs(store) do
+    self:Printf(" - '%s'", tname)
   end
 
   return
@@ -129,7 +143,7 @@ function AddOnTemplates:Load(input)
   if not requested then
     self:Print("ERROR Unknown template.")
     self:Print(" ")
-    self:Show()
+    self:ShowAll()
   end
 
   if current == requested then
@@ -157,11 +171,9 @@ function AddOnTemplates:getAddOns()
 
   for i=1, GetNumAddOns(), 1 do
     local name, _, _, loadable, _, _, _ = GetAddOnInfo(i)
-    if loadable then
-      local state = GetAddOnEnableState(nil, name)
-      if state > 0 then
-        table.insert(addons, name)
-      end
+    local state = GetAddOnEnableState(nil, name)
+    if state > 0 or loadable then
+      table.insert(addons, name)
     end
   end
 
@@ -217,14 +229,14 @@ function AddOnTemplates:Delete(input)
   if not requested then
     self:Print("ERROR Unknown template.")
     self:Print(" ")
-    self:Show()
+    self:ShowAll()
   end
 
   local removed = self:deleteTemplate(input)
 
   self:Print(" ")
   if removed then
-    self:Show()
+    self:ShowAll()
   else
     self:Printf("No templates were removed.")
   end
