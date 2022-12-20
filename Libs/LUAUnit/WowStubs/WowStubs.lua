@@ -31,7 +31,7 @@ wowAddOnTemplates = {
 
 -- WoW: Global functions
 -- ref: https://wowwiki-archive.fandom.com/wiki/API_UnitName
-function UnitName()
+function UnitName(_)
   return "TestCharacter"
 end
 

@@ -1,7 +1,7 @@
 lauunit ?= "https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua"
 
 test: Libs/LUAUnit/luaunit.lua
-	lua ./test/test.lua
+	lua ./test/test.lua -v
 
 Libs/LUAUnit:
 	make -p Libs/LUAUnit

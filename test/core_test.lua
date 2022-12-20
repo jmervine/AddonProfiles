@@ -13,13 +13,27 @@ TestCore = {} --class
   end
 
   -- TESTS
-  function TestCore:test_OnInitialize()
+  function TestCore:test_OnInitialize_onEmpty()
+    local tname = "TestCharacter@Default"
     -- AddOnTemplates:OnInitialize() is run before every test, so we don't need
     -- to run it here.
     lu.assertFalse(not AddOnTemplatesStore)
     lu.assertFalse(next(AddOnTemplatesStore) == false)
-    lu.assertFalse(not AddOnTemplatesStore["default"])
-    lu.assertFalse(next(AddOnTemplatesStore["default"]) == nil)
+    lu.assertFalse(not AddOnTemplatesStore[tname])
+    lu.assertFalse(next(AddOnTemplatesStore[tname]) == nil)
+  end
+
+  function TestCore:test_OnInitialize_withData()
+    local tname = "New_Template"
+    AddOnTemplatesStore = {
+      [tname] = { "TestAddOn_One", "TestAddOn_Two" }
+    }
+    -- AddOnTemplates:OnInitialize() is run before every test, so we don't need
+    -- to run it here.
+    lu.assertFalse(not AddOnTemplatesStore)
+    lu.assertFalse(next(AddOnTemplatesStore) == false)
+    lu.assertFalse(not AddOnTemplatesStore[tname])
+    lu.assertFalse(next(AddOnTemplatesStore[tname]) == nil)
   end
 
   function TestCore:test_getAddOns()

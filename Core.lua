@@ -1,11 +1,14 @@
 ADDON_NAME = "AddOnTemplates"
 
 AddOnTemplates = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0")
+AddOnTemplates.DefaultTemplate = string.format("%s@Default", UnitName("player"))
 
 function AddOnTemplates:OnInitialize()
-  AddOnTemplatesStore = {
-    ["default"] = self:getAddOns()
-  }
+  if not AddOnTemplatesStore or next(AddOnTemplatesStore) == nil then
+    AddOnTemplatesStore = {
+      [self.DefaultTemplate] = self:getAddOns()
+    }
+  end
 end
 
 
@@ -53,7 +56,6 @@ function AddOnTemplates:SlashHandler(input)
     return
   end
 
-  local default = "default"
   -- handle single input
   if input == "help" then
     self:Help()
@@ -62,7 +64,7 @@ function AddOnTemplates:SlashHandler(input)
   elseif input == "addons" then
     self:AddOns()
   elseif input == "save" then
-    self:Save(default)
+    self:Save(self.DefaultTemplate)
   elseif input == "load" then
     self:Print("'load' requires a template argument.")
   elseif input == "delete" then
