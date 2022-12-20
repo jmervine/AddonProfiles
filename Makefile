@@ -17,17 +17,6 @@ releases:
 	mkdir -p releases
 
 release: releases
-	mkdir -p releases/AddOnTemplates
-	cp -vr ./*.toc releases/AddOnTemplates/
-	cp -vr ./*.lua releases/AddOnTemplates/
-	cp -vr ./*.xml releases/AddOnTemplates/
-	cp -vr ./*.md releases/AddOnTemplates/
-	cp -vr ./VERSION releases/AddOnTemplates/
-	cp -vr ./Libs releases/AddOnTemplates/
-	rm -r  ./releases/AddOnTemplates/Libs/LUAUnit
-	cd releases \
-		&& zip AddOnTemplates-$(shell cat ./VERSION).zip AddOnTemplates/**/* \
-		&& rm -rf AddOnTemplates
 	git commit -a -m "Release $(shell cat ./VERSION)."
 	git tag -f $(shell cat ./VERSION)
 
