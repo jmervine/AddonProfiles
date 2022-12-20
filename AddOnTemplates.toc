@@ -1,9 +1,8 @@
 ## Title: AddOnTemplates
-## Notes: Manage AddOn Enabled / Disabled state
-## Author: Hound
-## Version: 0.1
+## Notes: Save and load AddOn enabled/disabled templates.
+## Author: Hound @ Atiesh (WotLK)
+## Version: 0.0.2-beta5
 ## SavedVariables: AddOnTemplatesStore
-## SavedVariablesPerCharacter: AddOnTemplatesStore
 ## OptionalDeps: Ace3
 ## Interface: 30400
 ## X-Interface: 30400
