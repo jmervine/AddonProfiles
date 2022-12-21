@@ -1,16 +1,16 @@
 -- This file is not loaded in testing, so by setting this true here, we make sure that we
 -- can skip loading this file in tests.
-AddOnTemplates.LibsUI = true
+AddonProfiles.LibsUI = true
 
 -- InitializeUI
-function AddOnTemplates:InitializeUI()
+function AddonProfiles:InitializeUI()
   self:CreateOptionsFrame()
   self:CreateReloadUI()
 end
 
 -- ReloadUI
-function AddOnTemplates:CreateReloadUI()
-  StaticPopupDialogs["ADDON_TEMPLATES_RELOAD_UI"] = {
+function AddonProfiles:CreateReloadUI()
+  StaticPopupDialogs["ADDON_PROFILES_RELOAD_UI"] = {
     text = "Reload UI?",
     button1 = "Reload",
     button2 = "Cancel",
@@ -19,8 +19,8 @@ function AddOnTemplates:CreateReloadUI()
         ReloadUI()
     end,
     OnCancel = function()
-      AddOnTemplates:Printf(" ")
-      AddOnTemplates:Printf("Type '/reload' to activate AddOns.")
+      AddonProfiles:Printf(" ")
+      AddonProfiles:Printf("Type '/reload' to activate Addons.")
     end,
     timeout = 0,
     whileDead = true,
@@ -29,18 +29,18 @@ function AddOnTemplates:CreateReloadUI()
   }
 end
 
-function AddOnTemplates:ReloadUI()
-  StaticPopup_Show("ADDON_TEMPLATES_RELOAD_UI")
+function AddonProfiles:ReloadUI()
+  StaticPopup_Show("ADDON_PROFILES_RELOAD_UI")
 end
 
 -- OptionsUI
-function AddOnTemplates:CreateOptionsFrame()
+function AddonProfiles:CreateOptionsFrame()
   if not self.OptionsFrame then
     local frame = CreateFrame("Frame")
     frame.name = self.ADDON_NAME
     InterfaceOptions_AddCategory(frame)
 
-    local scroll = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate") 
+    local scroll = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", 3, -4)
     scroll:SetPoint("BOTTOMRIGHT", -27, 4)
 
@@ -53,13 +53,13 @@ function AddOnTemplates:CreateOptionsFrame()
     title:SetPoint("TOPLEFT", 10, -10)
     title:SetText(self.ADDON_NAME)
 
-    local usage = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText") 
+    local usage = panel:CreateFontString(nil, "OVERLAY", "GameTooltipText")
     usage:SetJustifyH("LEFT")
     usage:SetJustifyV("TOP")
     usage:SetPoint("TOPLEFT", 10, -40)
 
     local usageText = {
-      string.format("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '")), 
+      string.format("Usage: /%s [option] (aliases: '%s')", self.SlashCommands, table.concat(self.SlashAliases, "', '")),
       "" -- for two newlines
     }
 
@@ -69,16 +69,16 @@ function AddOnTemplates:CreateOptionsFrame()
 
     table.insert(usageText, "")
     table.insert(usageText, "")
-    table.insert(usageText, "Saved Templates:")
+    table.insert(usageText, "Saved Profiles:")
     table.insert(usageText, "")
 
-    local store = AddOnTemplatesStore
+    local store = AddonProfilesStore
 
     if store == nil or next(store) == nil then
-      table.insert(usageText, "No saved templates.")
+      table.insert(usageText, "No saved profiles.")
     else
-      for tname, template in pairs(store) do
-        table.insert(usageText, string.format("  '%s' with %d AddOns.", tname, table.maxn(template)))
+      for tname, profile in pairs(store) do
+        table.insert(usageText, string.format("  '%s' with %d Addons.", tname, table.maxn(profile)))
       end
     end
 
@@ -87,10 +87,10 @@ function AddOnTemplates:CreateOptionsFrame()
     self.OptionsFrame = frame
   end
 
-  return self.OptionsFrame 
+  return self.OptionsFrame
 end
 
-function AddOnTemplates:OpenOptions()
-  InterfaceAddOnsList_Update()
+function AddonProfiles:OpenOptions()
+  InterfaceAddonsList_Update()
   InterfaceOptionsFrame_OpenToCategory(self.ADDON_NAME)
 end

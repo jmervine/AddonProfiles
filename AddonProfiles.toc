@@ -1,0 +1,13 @@
+## Title: AddonProfiles
+## Notes: Save and load Addon enabled/disabled profiles.
+## Author: Hound @ Atiesh (WotLK)
+## Version: 0.0.2-beta7
+## SavedVariables: AddonProfilesStore
+## OptionalDeps: Ace3
+## Interface: 30400
+## X-Interface: 30400
+
+embeds.xml
+
+Core.lua
+Libs/AddonProfiles/UI.lua
