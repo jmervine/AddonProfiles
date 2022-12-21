@@ -3,68 +3,69 @@ TestCore = {} --class
   -- setup / teardown
   function TestCore:setUp()
     -- setups
-    AddOnTemplates:OnInitialize()
+    AddonProfiles:OnInitialize()
 
-    TestCore.backupStore = AddOnTemplatesStore
+    TestCore.backupStore = AddonProfilesStore
   end
 
   function TestCore:tearDown()
-    AddOnTemplatesStore = TestCore.backupStore
+    AddonProfilesStore = TestCore.backupStore
   end
 
   -- TESTS
   function TestCore:test_OnInitialize_onEmpty()
-    local tname = "TestCharacter@Default"
-    -- AddOnTemplates:OnInitialize() is run before every test, so we don't need
-    -- to run it here.
-    lu.assertFalse(not AddOnTemplatesStore)
-    lu.assertFalse(next(AddOnTemplatesStore) == false)
-    lu.assertFalse(not AddOnTemplatesStore[tname])
-    lu.assertFalse(next(AddOnTemplatesStore[tname]) == nil)
+    AddonProfilesStore = nil
+    AddonProfiles:OnInitialize()
+
+    local pname = "TestCharacter@Default"
+    lu.assertFalse(not AddonProfilesStore)
+    lu.assertFalse(next(AddonProfilesStore) == false)
+    lu.assertFalse(not AddonProfilesStore[pname])
+    lu.assertFalse(next(AddonProfilesStore[pname]) == nil)
   end
 
   function TestCore:test_OnInitialize_withData()
-    local tname = "New_Template"
-    AddOnTemplatesStore = {
-      [tname] = { "TestAddOn_One", "TestAddOn_Two" }
+    local pname = "New_Profile"
+    AddonProfilesStore = {
+      [pname] = { "TestAddon_One", "TestAddon_Two" }
     }
-    -- AddOnTemplates:OnInitialize() is run before every test, so we don't need
+    -- AddonProfiles:OnInitialize() is run before every test, so we don't need
     -- to run it here.
-    lu.assertFalse(not AddOnTemplatesStore)
-    lu.assertFalse(next(AddOnTemplatesStore) == false)
-    lu.assertFalse(not AddOnTemplatesStore[tname])
-    lu.assertFalse(next(AddOnTemplatesStore[tname]) == nil)
+    lu.assertFalse(not AddonProfilesStore)
+    lu.assertFalse(next(AddonProfilesStore) == false)
+    lu.assertFalse(not AddonProfilesStore[pname])
+    lu.assertFalse(next(AddonProfilesStore[pname]) == nil)
   end
 
-  function TestCore:test_getAddOns()
-    local addons = AddOnTemplates:getAddOns()
-    lu.assertEquals(addons, { "TestAddOn_One", "TestAddOn_Two" })
+  function TestCore:test_getAddons()
+    local addons = AddonProfiles:getAddons()
+    lu.assertEquals(addons, { "TestAddon_One", "TestAddon_Two" })
   end
 
-  function TestCore:test_saveAddOnTemplate()
-    local state1 = { "TestAddOn_One", "TestAddOn_Two" }
+  function TestCore:test_saveAddonProfile()
+    local state1 = { "TestAddon_One", "TestAddon_Two" }
 
-    AddOnTemplatesStore = nil
-    AddOnTemplates:saveAddOnTemplate("Test_Template1", state1)
+    AddonProfilesStore = nil
+    AddonProfiles:saveAddonProfile("Test_Profile1", state1)
 
-    lu.assertEquals(AddOnTemplatesStore["Test_Template1"], state1)
+    lu.assertEquals(AddonProfilesStore["Test_Profile1"], state1)
 
     local state2 = state1
-    table.insert(state2, "TestAddOn_Three")
-    AddOnTemplates:saveAddOnTemplate("Test_Template2", state2)
+    table.insert(state2, "TestAddon_Three")
+    AddonProfiles:saveAddonProfile("Test_Profile2", state2)
 
-    lu.assertEquals(AddOnTemplatesStore["Test_Template1"], state1)
-    lu.assertEquals(AddOnTemplatesStore["Test_Template2"], state2)
+    lu.assertEquals(AddonProfilesStore["Test_Profile1"], state1)
+    lu.assertEquals(AddonProfilesStore["Test_Profile2"], state2)
   end
 
-  function TestCore:test_deleteTemplate()
-    local state = { "TestAddOn_One", "TestAddOn_Two" }
-    AddOnTemplatesStore["Test_Delete"] = state
+  function TestCore:test_deleteProfile()
+    local state = { "TestAddon_One", "TestAddon_Two" }
+    AddonProfilesStore["Test_Delete"] = state
 
-    local removed = AddOnTemplates:deleteTemplate("Test_Delete")
+    local removed = AddonProfiles:deleteProfile("Test_Delete")
     lu.assertTrue(removed)
-    lu.assertTrue(AddOnTemplatesStore["Test_Delete"] == nil)
+    lu.assertTrue(AddonProfilesStore["Test_Delete"] == nil)
 
-    removed = AddOnTemplates:deleteTemplate("Test_Delete")
+    removed = AddonProfiles:deleteProfile("Test_Delete")
     lu.assertFalse(removed)
   end

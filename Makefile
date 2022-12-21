@@ -8,8 +8,8 @@ Libs/LUAUnit/luaunit.lua: Libs/LUAUnit
 	curl -s https://raw.githubusercontent.com/bluebird75/luaunit/LUAUNIT_V3_4/luaunit.lua > Libs/LUAUnit/luaunit.lua
 
 ci:
-	docker build -t jmervine/addontemplates:test -f Dockerfile.test .
-	docker run -t jmervine/addontemplates:test
+	docker build -t jmervine/addonprofiles:test -f Dockerfile.test .
+	docker run -t jmervine/addonprofiles:test
 
 releases:
 	mkdir -p releases

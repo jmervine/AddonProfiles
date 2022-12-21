@@ -1,41 +1,41 @@
-# AddOnTemplates
+# AddonProfiles
 
-Simple World of Warcraft AddOn designed to allow the user to save templates of
-their current AddOn enablement state to quickly switch from one to another. The
-idea being, if they use a lot of AddOns, as I do, they'll want some enabled while
+Simple World of Warcraft Addon designed to allow the user to save profiles of
+their current Addon enabled state to quickly switch from one to another. The
+idea being, if they use a lot of Addons, as I do, they'll want some enabled while
 leveling, others enabled while in the open world and still others while raiding.
 
 > ### Warning
 >
-> This is my first AddOn, is still developement, and was developed with WotLK in
+> This is my first Addon, is still developement, and was developed with WotLK in
 > mind and the focused test environment.
 
 ## Install
 
 > NOTE: While in beta, this only supports install directly from Github.
 
-1. Visit the [Github releases page](https://github.com/jmervine/wow-AddOnTemplates/releases).
+1. Visit the [Github releases page](https://github.com/jmervine/wow-AddonProfiles/releases).
 1. Download the latest release.
-1. Extract the downloaded `wow-AddOnTemplates-{{version}}.zip` file and extract it.
-1. Rename the extracted directory to `AddOnTemplates`.
-1. Copy `AddOnTemplates` to you WoW AddOns directory.
+1. Extract the downloaded `wow-AddonProfiles-{{version}}.zip` file and extract it.
+1. Rename the extracted directory to `AddonProfiles`.
+1. Copy `AddonProfiles` to you WoW Addons directory.
 
 ## Usage
 ```
-[AddOnTemplates] Usage: /addontemplates [option] (aliases: 'at', 'addons')
-[AddOnTemplates]   'show [TEMPLATE]': Show saved template or templates.
-[AddOnTemplates]   'addons ': List currently enabled AddOns.
-[AddOnTemplates]   'help [SUBCOMMAND]': Show help message.
-[AddOnTemplates]   'load TEMPLATE': Load saved 'TEMPLATE'.
-[AddOnTemplates]   'save TEMPLATE': Saved current AddOn state as 'TEMPLATE'.
-[AddOnTemplates]   'delete TEMPLATE': Delete saved 'TEMPLATE'.
+[AddonProfiles] Usage: /addonprofiles [option] (aliases: 'at', 'addons')
+[AddonProfiles]   'show [PROFILE]': Show saved profile or profiles.
+[AddonProfiles]   'addons ': List currently enabled Addons.
+[AddonProfiles]   'help [SUBCOMMAND]': Show help message.
+[AddonProfiles]   'load PROFILE': Load saved 'PROFILE'.
+[AddonProfiles]   'save PROFILE': Saved current Addon state as 'PROFILE'.
+[AddonProfiles]   'delete PROFILE': Delete saved 'PROFILE'.
 ```
 
 ## Development
 
 #### WoW Builtins
 
-All WoW builtins that are used in the current iteration of this AddOn
+All WoW builtins that are used in the current iteration of this Addon
 are included via `Libs/LUAUnit/WowStubs/WowStubs.lua`. If you are adding and
 testing new functionality that requires a WoW builtin, add it there and be sure
 to add a test for it in `test/stub_test.lua`.

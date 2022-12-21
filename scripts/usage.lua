@@ -6,7 +6,7 @@ loadfile("Libs/AceConsole-3.0/AceConsole-3.0.lua")()
 loadfile("Libs/AceAddon-3.0/AceAddon-3.0.lua")()
 require("Core")
 
-local this = AddOnTemplates
+local this = AddonProfiles
 print(string.format("Usage: /%s [option] (aliases: '%s')", this.SlashCommands, table.concat(this.SlashAliases, "', '")))
 
 for cmd, cfg in pairs(this.HelpMessages) do
