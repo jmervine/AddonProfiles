@@ -1,4 +1,4 @@
-require("Libs.LUAUnit.WowStubs.SavedVariables")
+require("Libs.WowStubs.SavedVariables")
 
 SlashCmdList = {}
 

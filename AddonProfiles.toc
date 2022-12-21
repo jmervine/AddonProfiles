@@ -9,5 +9,7 @@
 
 embeds.xml
 
+Libs/Base64/base64.lua
+
 Core.lua
 Libs/AddonProfiles/UI.lua

@@ -69,3 +69,11 @@ TestCore = {} --class
     removed = AddonProfiles:deleteProfile("Test_Delete")
     lu.assertFalse(removed)
   end
+
+  function TestCore:test_Export_Import()
+    local store  = AddonProfilesStore
+    local export = AddonProfiles:Export()
+    local import = AddonProfiles:Import(export)
+
+    lu.assertEquals(import, store)
+  end

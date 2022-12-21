@@ -1,5 +1,9 @@
 -- Build "AddonProfiles" addon.
-AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
+local AceAddon = LibStub("AceAddon-3.0")
+--local AceGUI = LibStub("AceGUI-3.0")
+
+AddonProfiles = AceAddon:NewAddon("AddonProfiles", "AceConsole-3.0", "AceSerializer-3.0")
+
 AddonProfiles.ADDON_NAME = "AddonProfiles"
 AddonProfiles.DefaultProfile = string.format("%s@Default", UnitName("player"))
 
@@ -240,4 +244,51 @@ function AddonProfiles:Delete(input)
   end
 
   return
+end
+
+function AddonProfiles:serializeStore()
+  if not AddonProfilesStore or next(AddonProfilesStore) == nil then
+    return nil
+  end
+
+  local s = self:Serialize(AddonProfilesStore)
+  if not s or s == "" then
+    return nil
+  end
+
+  return Base64.encode(s)
+end
+
+function AddonProfiles:deserializeString(str)
+  local de = Base64.decode(str)
+  local ds = self:Deserialize(de)
+
+  return ds
+end
+
+-- exports all saved configuration
+function AddonProfiles:Export()
+  if not AddonProfilesStore or next(AddonProfilesStore) == nil then
+    self:Print("Nothing to export.")
+    return
+  end
+
+  local s = self:Serialize(AddonProfilesStore)
+  if not s or s == "" then
+    self:Print("A serialization error occurred.")
+    return nil
+  end
+
+  return Base64.encode(s)
+end
+
+function AddonProfiles:Import(str)
+  local de = Base64.decode(str)
+  local ok, ds = self:Deserialize(de)
+  if not ok then
+    self:Printf("Deserialization error: %s", ds)
+    return
+  end
+
+  return ds
 end
