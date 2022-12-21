@@ -301,7 +301,8 @@ function AddonProfiles:ImportProfiles(str)
   local de = Base64.decode(str)
   local ok, new = self:Deserialize(de)
   if not ok then
-    return false, string.format("Import error: %s", ds)
+    err = ( (err and type(err) == "string") or "An unknown error occurred" )
+    return false, string.format("Import error: %s", err)
   end
 
   local ok, err = self:validateImport(new)
