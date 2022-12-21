@@ -1,6 +1,5 @@
 -- Build "AddonProfiles" addon.
 local AceAddon = LibStub("AceAddon-3.0")
---local AceGUI = LibStub("AceGUI-3.0")
 
 AddonProfiles = AceAddon:NewAddon("AddonProfiles", "AceConsole-3.0", "AceSerializer-3.0")
 
@@ -46,6 +45,14 @@ AddonProfiles.HelpMessages = {
     desc = "Saved current Addon state as 'PROFILE'.",
     opts = "PROFILE"
   },
+  ["import"] = {
+    desc = "Open GUI for importing exported profiles string.",
+    opts = ""
+  },
+  ["export"] = {
+    desc = "Open GUI for exporting profiles string.",
+    opts = ""
+  },
   ["delete"] = {
     desc = "Delete saved 'PROFILE'.",
     opts = "PROFILE"
@@ -72,6 +79,10 @@ function AddonProfiles:SlashHandler(input)
     self:ShowAll()
   elseif input == "addons" then
     self:Addons()
+  elseif input == "import" then
+    self:Import()
+  elseif input == "export" then
+    self:Export()
   elseif input == "save" then
     self:Save(self.DefaultProfile)
   elseif input == "load" then
@@ -102,8 +113,14 @@ end
 
 function AddonProfiles:Help()
   self:OpenOptions()
+end
 
-  return
+function AddonProfiles:Import()
+  self:ImportUI()
+end
+
+function AddonProfiles:Export()
+  self:ExportUI()
 end
 
 function AddonProfiles:ShowOne(profile)
@@ -267,28 +284,39 @@ function AddonProfiles:deserializeString(str)
 end
 
 -- exports all saved configuration
-function AddonProfiles:Export()
+function AddonProfiles:ExportProfiles()
   if not AddonProfilesStore or next(AddonProfilesStore) == nil then
-    self:Print("Nothing to export.")
-    return
+    return false, "Nothing to export."
   end
 
   local s = self:Serialize(AddonProfilesStore)
   if not s or s == "" then
-    self:Print("A serialization error occurred.")
-    return nil
+    return false, "ERROR: A serialization error occurred."
   end
 
-  return Base64.encode(s)
+  return true, Base64.encode(s)
 end
 
-function AddonProfiles:Import(str)
+function AddonProfiles:ImportProfiles(str)
   local de = Base64.decode(str)
-  local ok, ds = self:Deserialize(de)
+  local ok, new = self:Deserialize(de)
   if not ok then
-    self:Printf("Deserialization error: %s", ds)
-    return
+    return false, string.format("Import error: %s", ds)
   end
 
-  return ds
+  local ok, err = self:validateImport(new)
+  if not ok then
+    return false, string.format("Import error: %s", err)
+  end
+
+  AddonProfilesStore = new
+  return true, new
+end
+
+function AddonProfiles:validateImport(profiles)
+  if not profiles or next(profiles) == nil then
+    return false, "Imported profiles are nil or empty."
+  end
+
+  return true, ""
 end

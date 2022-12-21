@@ -72,8 +72,15 @@ TestCore = {} --class
 
   function TestCore:test_Export_Import()
     local store  = AddonProfilesStore
-    local export = AddonProfiles:Export()
-    local import = AddonProfiles:Import(export)
+
+    local ok, export = AddonProfiles:ExportProfiles()
+    lu.assertTrue(ok)
+
+    local ok, _ = AddonProfiles:ImportProfiles("")
+    lu.assertFalse(ok)
+
+    local ok, import = AddonProfiles:ImportProfiles(export)
+    lu.assertTrue(ok)
 
     lu.assertEquals(import, store)
   end

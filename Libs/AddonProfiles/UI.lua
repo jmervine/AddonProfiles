@@ -2,10 +2,109 @@
 -- can skip loading this file in tests.
 AddonProfiles.LibsUI = true
 
+local AceGUI = LibStub("AceGUI-3.0")
+
 -- InitializeUI
 function AddonProfiles:InitializeUI()
   self:CreateOptionsFrame()
   self:CreateReloadUI()
+end
+
+-- ImportUI
+function AddonProfiles:ImportUI()
+  local frame = AceGUI:Create("Frame")
+  frame:SetLayout("Flow")
+  frame:SetTitle(string.format("%s - Import", AddonProfiles.ADDON_NAME))
+  frame:SetStatusText("Paste in import string.")
+  frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
+
+  local editbox = AceGUI:Create("EditBox")
+  editbox:SetWidth(600)
+  editbox:SetHeight(600)
+  editbox:SetFocus()
+  editbox:SetMultiLine()
+  frame:AddChild(editbox)
+
+  local import = AceGUI:Create("Button")
+  import:SetText("Import")
+  import:SetWidth(100)
+  import:RegisterForClicks("AnyUp", "AnyDown")
+  import:SetScript("OnClick", function (_, button, down)
+    if not down and button == "LeftButton" then
+      local ok, msg = self:ImportProfiles(editbox:GetText())
+      if not ok then
+        frame:SetStatusText(msg)
+        return
+      end
+
+      frame:SetStatusText("Import successful.")
+      local usageText = {}
+      table.insert(usageText, "Saved Profiles:")
+      table.insert(usageText, "")
+
+      local store = AddonProfilesStore
+
+      if store == nil or next(store) == nil then
+        table.insert(usageText, "No saved profiles.")
+      else
+        for tname, profile in pairs(store) do
+          table.insert(usageText, string.format("  '%s' with %d Addons.", tname, table.maxn(profile)))
+        end
+      end
+
+      editbox:SetText(table.concat(usageText, "\n"))
+    end
+  end)
+  frame:AddChild(import)
+
+  local cancel = AceGUI:Create("Button")
+  cancel:SetText("Cancel")
+  cancel:SetWidth(100)
+  cancel:RegisterForClicks("AnyUp", "AnyDown")
+  cancel:SetScript("OnClick", function (_, button, down)
+    if not down and button == "LeftButton" then
+      AceGUI:Release(frame)
+    end
+  end)
+  frame:AddChild(cancel)
+end
+
+-- ExportUI
+function AddonProfiles:ExportUI()
+  local statusText = "Copy and save export string."
+  local exported = ""
+
+  local ok, str = self:Export()
+  if not ok then
+    statusText = str
+  else
+    exported = str
+  end
+
+  local frame = AceGUI:Create("Frame")
+  frame:SetLayout("Flow")
+  frame:SetTitle(string.format("%s - Export", AddonProfiles.ADDON_NAME))
+  frame:SetStatusText(statsText)
+  frame:SetCallback("OnClose", function(widget) AceGUI:Release(widget) end)
+
+  local editbox = AceGUI:Create("EditBox")
+  editbox:SetWidth(600)
+  editbox:SetHeight(600)
+  editbox:SetFocus()
+  editbox:SetMultiLine()
+  editbox:SetText(exported)
+  frame:AddChild(editbox)
+
+  local cancel = AceGUI:Create("Button")
+  cancel:SetText("Close")
+  cancel:SetWidth(100)
+  cancel:RegisterForClicks("AnyUp", "AnyDown")
+  cancel:SetScript("OnClick", function (_, button, down)
+    if not down and button == "LeftButton" then
+      AceGUI:Release(frame)
+    end
+  end)
+  frame:AddChild(cancel)
 end
 
 -- ReloadUI
