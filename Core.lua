@@ -1,5 +1,8 @@
 -- Build "AddonProfiles" addon.
-AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
+local AceAddon = LibStub("AceAddon-3.0")
+
+AddonProfiles = AceAddon:NewAddon("AddonProfiles", "AceConsole-3.0", "AceSerializer-3.0")
+
 AddonProfiles.ADDON_NAME = "AddonProfiles"
 AddonProfiles.DefaultProfile = string.format("%s@Default", UnitName("player"))
 
@@ -42,6 +45,14 @@ AddonProfiles.HelpMessages = {
     desc = "Saved current Addon state as 'PROFILE'.",
     opts = "PROFILE"
   },
+  ["import"] = {
+    desc = "Open GUI for importing exported profiles string.",
+    opts = ""
+  },
+  ["export"] = {
+    desc = "Open GUI for exporting profiles string.",
+    opts = ""
+  },
   ["delete"] = {
     desc = "Delete saved 'PROFILE'.",
     opts = "PROFILE"
@@ -68,6 +79,10 @@ function AddonProfiles:SlashHandler(input)
     self:ShowAll()
   elseif input == "addons" then
     self:Addons()
+  elseif input == "import" then
+    self:Import()
+  elseif input == "export" then
+    self:Export()
   elseif input == "save" then
     self:Save(self.DefaultProfile)
   elseif input == "load" then
@@ -97,8 +112,18 @@ function AddonProfiles:SlashHandler(input)
 end
 
 function AddonProfiles:Help()
-  self:OpenOptions()
+  -- self:OpenOptions()
+  self:HelpUI()
+  return
+end
 
+function AddonProfiles:Import()
+  self:ImportUI()
+  return
+end
+
+function AddonProfiles:Export()
+  self:ExportUI()
   return
 end
 
@@ -113,6 +138,7 @@ function AddonProfiles:ShowOne(profile)
   self:Printf("Profile: %s", profile)
   local astr = table.concat(addons, ", ")
   self:Printf(" %s", astr)
+  return
 end
 
 function AddonProfiles:ShowAll()
@@ -240,4 +266,63 @@ function AddonProfiles:Delete(input)
   end
 
   return
+end
+
+function AddonProfiles:serializeStore()
+  if not AddonProfilesStore or next(AddonProfilesStore) == nil then
+    return nil
+  end
+
+  local s = self:Serialize(AddonProfilesStore)
+  if not s or s == "" then
+    return nil
+  end
+
+  return Base64.encode(s)
+end
+
+function AddonProfiles:deserializeString(str)
+  local de = Base64.decode(str)
+  local ds = self:Deserialize(de)
+
+  return ds
+end
+
+-- exports all saved configuration
+function AddonProfiles:ExportProfiles()
+  if not AddonProfilesStore or next(AddonProfilesStore) == nil then
+    return false, "Nothing to export."
+  end
+
+  local s = self:Serialize(AddonProfilesStore)
+  if not s or s == "" then
+    return false, "ERROR: A serialization error occurred."
+  end
+
+  return true, Base64.encode(s)
+end
+
+function AddonProfiles:ImportProfiles(str)
+  local de = Base64.decode(str)
+  local ok, new = self:Deserialize(de)
+  if not ok then
+    err = ( (err and type(err) == "string") or "An unknown error occurred" )
+    return false, string.format("Import error: %s", err)
+  end
+
+  local ok, err = self:validateImport(new)
+  if not ok then
+    return false, string.format("Import error: %s", err)
+  end
+
+  AddonProfilesStore = new
+  return true, new
+end
+
+function AddonProfiles:validateImport(profiles)
+  if not profiles or next(profiles) == nil then
+    return false, "Imported profiles are nil or empty."
+  end
+
+  return true, ""
 end

@@ -1,10 +1,13 @@
 #!/usr/bin/env lua
-require("Libs.LUAUnit.WowStubs.WowStubs")
+require("Libs.WowStubs.WowStubs")
 
 lu = require("Libs.LUAUnit.luaunit")
 
+loadfile("Libs/Base64/base64.lua")()
 loadfile("Libs/LibStub/LibStub.lua")()
+loadfile("Libs/AceSerializer-3.0/AceSerializer-3.0.lua")()
 loadfile("Libs/AceConsole-3.0/AceConsole-3.0.lua")()
+--loadfile("Libs/AceGUI-3.0/AceGUI-3.0.lua")()
 loadfile("Libs/AceAddon-3.0/AceAddon-3.0.lua")()
 
 require("Core")
