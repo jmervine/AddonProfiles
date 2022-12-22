@@ -112,15 +112,19 @@ function AddonProfiles:SlashHandler(input)
 end
 
 function AddonProfiles:Help()
-  self:OpenOptions()
+  -- self:OpenOptions()
+  self:HelpUI()
+  return
 end
 
 function AddonProfiles:Import()
   self:ImportUI()
+  return
 end
 
 function AddonProfiles:Export()
   self:ExportUI()
+  return
 end
 
 function AddonProfiles:ShowOne(profile)
@@ -134,6 +138,7 @@ function AddonProfiles:ShowOne(profile)
   self:Printf("Profile: %s", profile)
   local astr = table.concat(addons, ", ")
   self:Printf(" %s", astr)
+  return
 end
 
 function AddonProfiles:ShowAll()
