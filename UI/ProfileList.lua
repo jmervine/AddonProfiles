@@ -29,35 +29,18 @@ function UI:PopulateProfileList()
     container:SetFullHeight(true)
     container:SetLayout("List")
     
-    -- Scope selector (tabs)
-    local scopeGroup = AceGUI:Create("SimpleGroup")
+    -- Scope selector (tab-style buttons)
+    local scopeGroup = AceGUI:Create("TabGroup")
     scopeGroup:SetFullWidth(true)
-    scopeGroup:SetLayout("Flow")
-    
-    local charButton = AceGUI:Create("Button")
-    charButton:SetText("Character")
-    charButton:SetWidth(115)
-    charButton:SetCallback("OnClick", function()
-        self.currentScope = "character"
+    scopeGroup:SetTabs({
+        {text="Character", value="character"},
+        {text="Account", value="account"}
+    })
+    scopeGroup:SetCallback("OnGroupSelected", function(widget, event, group)
+        self.currentScope = group
         self:PopulateProfileList()
     end)
-    if self.currentScope == "character" then
-        charButton:SetDisabled(true)
-    end
-    
-    local acctButton = AceGUI:Create("Button")
-    acctButton:SetText("Account")
-    acctButton:SetWidth(115)
-    acctButton:SetCallback("OnClick", function()
-        self.currentScope = "account"
-        self:PopulateProfileList()
-    end)
-    if self.currentScope == "account" then
-        acctButton:SetDisabled(true)
-    end
-    
-    scopeGroup:AddChild(charButton)
-    scopeGroup:AddChild(acctButton)
+    scopeGroup:SelectTab(self.currentScope)
     container:AddChild(scopeGroup)
     
     -- New Profile button

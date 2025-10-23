@@ -234,10 +234,8 @@ function AddonProfiles:LoadProfile(name)
     
     if success then
         self:Printf("Activated profile '%s'. Reloading UI...", name)
-        -- Schedule reload
-        C_Timer.After(1, function()
-            ReloadUI()
-        end)
+        -- Reload UI immediately (Classic doesn't have C_Timer)
+        ReloadUI()
     else
         self:Printf("Error activating profile: %s", err)
     end

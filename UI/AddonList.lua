@@ -182,7 +182,7 @@ function UI:PopulateAddonList()
                 
                 checkbox:SetCallback("OnValueChanged", function(widget, event, value)
                     profile.addons[name] = value or nil
-                    self:PopulateAddonList() -- Refresh to update dependency graying
+                    -- Only update settings panel, not entire addon list (prevents scroll jump)
                     self:PopulateSettings() -- Update dep count
                 end)
                 

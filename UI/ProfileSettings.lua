@@ -137,12 +137,12 @@ function UI:PopulateSettings()
     container:AddChild(spacer4)
     
     local captureBtn = AceGUI:Create("Button")
-    captureBtn:SetText("Capture Current")
+    captureBtn:SetText("Select Active Addons")
     captureBtn:SetFullWidth(true)
     captureBtn:SetCallback("OnClick", function()
         local success, err = AddonProfiles.ProfileManager:SaveCurrentState(profileName, profileScope)
         if success then
-            AddonProfiles:Print("Captured current addon state.")
+            AddonProfiles:Print("Selected currently active addons.")
             self:Refresh()
         else
             AddonProfiles:Printf("Error: %s", err)
@@ -162,10 +162,8 @@ function UI:ApplyProfile(profileName, profileScope)
         OnAccept = function()
             local success, err = AddonProfiles.ProfileManager:ActivateProfile(profileName, profileScope)
             if success then
-                -- Schedule reload
-                C_Timer.After(0.5, function()
-                    ReloadUI()
-                end)
+                -- Reload UI immediately (Classic doesn't have C_Timer)
+                ReloadUI()
             else
                 AddonProfiles:Printf("Error: %s", err)
             end
