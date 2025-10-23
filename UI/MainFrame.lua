@@ -121,8 +121,11 @@ function UI:Refresh()
 end
 
 function UI:SelectProfile(name, scope)
+    AddonProfiles:Printf("SelectProfile called: %s (scope: %s)", name, scope)
     self.currentProfile = { name = name, scope = scope }
+    AddonProfiles:Printf("Calling Refresh()...")
     self:Refresh()
+    AddonProfiles:Printf("Refresh() completed")
 end
 
 function UI:GetSelectedProfile()

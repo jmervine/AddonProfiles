@@ -134,13 +134,18 @@ function UI:PopulateProfileList()
     
     -- Handle profile selection
     treeGroup:SetCallback("OnGroupSelected", function(widget, event, group)
+        AddonProfiles:Printf("TreeGroup selected: %s", tostring(group))
+        
         -- Store tree status before processing selection
         self.treeStatus = treeGroup:GetStatusTable()
         
         -- Check if it's a profile (has colon) vs a category
         if group:find(":") then
             local scope, name = group:match("([^:]+):(.+)")
+            AddonProfiles:Printf("Selecting profile: %s (scope: %s)", name, scope)
             self:SelectProfile(name, scope)
+        else
+            AddonProfiles:Printf("Category selected (ignored): %s", group)
         end
     end)
     
