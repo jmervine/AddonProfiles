@@ -28,16 +28,16 @@ function UI:CreateMainFrame()
     -- Store reference
     self.MainFrame = frame
     
-    -- Create main container with three columns using relative widths
+    -- Create main container with three columns using relative widths that sum to 1.0
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetFullHeight(true)
     container:SetLayout("Flow")
     
-    -- Left panel (Profile List) - 27% relative width
+    -- Left panel (Profile List) - 28% relative width
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
-    leftPanel:SetRelativeWidth(0.27)
+    leftPanel:SetRelativeWidth(0.28)
     leftPanel:SetFullHeight(true)
     leftPanel:SetLayout("Fill")
     
@@ -48,10 +48,10 @@ function UI:CreateMainFrame()
     middlePanel:SetFullHeight(true)
     middlePanel:SetLayout("Fill")
     
-    -- Right panel (Profile Settings) - 27% relative width
+    -- Right panel (Profile Settings) - 28% relative width (sums to 1.0)
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
-    rightPanel:SetRelativeWidth(0.27)
+    rightPanel:SetRelativeWidth(0.28)
     rightPanel:SetFullHeight(true)
     rightPanel:SetLayout("Fill")
     
