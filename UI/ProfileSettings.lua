@@ -111,6 +111,23 @@ function UI:PopulateSettings()
     spacer3:SetFullWidth(true)
     container:AddChild(spacer3)
     
+    -- Save Profile button (to make it clear changes are saved)
+    local saveBtn = AceGUI:Create("Button")
+    saveBtn:SetText("Save Profile")
+    saveBtn:SetFullWidth(true)
+    saveBtn:SetCallback("OnClick", function()
+        -- Profile changes are auto-saved, this just confirms
+        AddonProfiles:Printf("Profile '%s' saved successfully.", profileName)
+        self:Refresh()
+    end)
+    container:AddChild(saveBtn)
+    
+    -- Spacing
+    local spacer3b = AceGUI:Create("Label")
+    spacer3b:SetText(" ")
+    spacer3b:SetFullWidth(true)
+    container:AddChild(spacer3b)
+    
     -- Action buttons
     local applyBtn = AceGUI:Create("Button")
     applyBtn:SetText("Apply Profile")
