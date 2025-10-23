@@ -80,12 +80,18 @@ function UI:PopulateProfileList()
     local accountHeader = AceGUI:Create("InteractiveLabel")
     accountHeader:SetText((self.expandedCategories.account and "[-] " or "[+] ") .. "Account-wide")
     accountHeader:SetFullWidth(true)
-    accountHeader:SetFontObject(GameFontNormalLarge)
+    accountHeader:SetFontObject(GameFontNormal)
     accountHeader:SetCallback("OnClick", function()
         self.expandedCategories.account = not self.expandedCategories.account
         self:PopulateProfileList()
     end)
     scroll:AddChild(accountHeader)
+    
+    -- Spacing after header
+    local headerSpacer1 = AceGUI:Create("Label")
+    headerSpacer1:SetText(" ")
+    headerSpacer1:SetFullWidth(true)
+    scroll:AddChild(headerSpacer1)
     
     -- Account profiles
     if self.expandedCategories.account and #accountProfiles > 0 then
@@ -114,6 +120,12 @@ function UI:PopulateProfileList()
             end)
             
             scroll:AddChild(profileBtn)
+            
+            -- Small spacing between profiles
+            local profileSpacer = AceGUI:Create("Label")
+            profileSpacer:SetText(" ")
+            profileSpacer:SetFullWidth(true)
+            scroll:AddChild(profileSpacer)
         end
     end
     
@@ -129,12 +141,18 @@ function UI:PopulateProfileList()
         local charHeader = AceGUI:Create("InteractiveLabel")
         charHeader:SetText((self.expandedCategories.character and "[-] " or "[+] ") .. charName)
         charHeader:SetFullWidth(true)
-        charHeader:SetFontObject(GameFontNormalLarge)
+        charHeader:SetFontObject(GameFontNormal)
         charHeader:SetCallback("OnClick", function()
             self.expandedCategories.character = not self.expandedCategories.character
             self:PopulateProfileList()
         end)
         scroll:AddChild(charHeader)
+        
+        -- Spacing after header
+        local headerSpacer2 = AceGUI:Create("Label")
+        headerSpacer2:SetText(" ")
+        headerSpacer2:SetFullWidth(true)
+        scroll:AddChild(headerSpacer2)
         
         -- Character profiles
         if self.expandedCategories.character then
@@ -162,6 +180,12 @@ function UI:PopulateProfileList()
                 end)
                 
                 scroll:AddChild(profileBtn)
+                
+                -- Small spacing between profiles
+                local profileSpacer = AceGUI:Create("Label")
+                profileSpacer:SetText(" ")
+                profileSpacer:SetFullWidth(true)
+                scroll:AddChild(profileSpacer)
             end
         end
     end
