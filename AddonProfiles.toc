@@ -9,9 +9,9 @@
 
 embeds.xml
 
+Core.lua
 AddonManager.lua
 ProfileManager.lua
-Core.lua
 UI/MainFrame.lua
 UI/ProfileList.lua
 UI/AddonList.lua
