@@ -78,7 +78,7 @@ function UI:PopulateProfileList()
     
     -- Account-wide category
     local accountHeader = AceGUI:Create("InteractiveLabel")
-    accountHeader:SetText((self.expandedCategories.account and "▼ " or "▶ ") .. "Account-wide")
+    accountHeader:SetText((self.expandedCategories.account and "[-] " or "[+] ") .. "Account-wide")
     accountHeader:SetFullWidth(true)
     accountHeader:SetCallback("OnClick", function()
         self.expandedCategories.account = not self.expandedCategories.account
@@ -96,7 +96,7 @@ function UI:PopulateProfileList()
             local profileBtn = AceGUI:Create("InteractiveLabel")
             local text = "  " .. name .. " (" .. addonCount .. ")"
             if isActive then
-                text = "  ✓ " .. name .. " (" .. addonCount .. ")"
+                text = "  * " .. name .. " (" .. addonCount .. ")"
             end
             profileBtn:SetText(text)
             profileBtn:SetFullWidth(true)
@@ -125,7 +125,7 @@ function UI:PopulateProfileList()
     if #charProfiles > 0 then
         local charName = UnitName("player")
         local charHeader = AceGUI:Create("InteractiveLabel")
-        charHeader:SetText((self.expandedCategories.character and "▼ " or "▶ ") .. charName)
+        charHeader:SetText((self.expandedCategories.character and "[-] " or "[+] ") .. charName)
         charHeader:SetFullWidth(true)
         charHeader:SetCallback("OnClick", function()
             self.expandedCategories.character = not self.expandedCategories.character
