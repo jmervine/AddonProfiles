@@ -44,14 +44,12 @@ function UI:PopulateProfileList()
     spacer1:SetFullWidth(true)
     container:AddChild(spacer1)
     
-    -- Hierarchical profile tree
-    local treeGroup = AceGUI:Create("TreeGroup")
-    treeGroup:SetFullWidth(true)
-    treeGroup:SetFullHeight(true)
-    treeGroup:SetLayout("Fill")
+    -- Profile list with collapsible categories
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    scroll:SetLayout("List")
     
-    -- Build tree structure
-    local tree = {}
     local profiles = AddonProfiles.ProfileManager:GetAllProfiles("all")
     local activeName, activeScope = AddonProfiles.ProfileManager:GetActiveProfile()
     
@@ -70,92 +68,102 @@ function UI:PopulateProfileList()
     table.sort(accountProfiles)
     table.sort(charProfiles)
     
-    -- Add Account-wide category
-    if #accountProfiles > 0 then
-        table.insert(tree, {
-            value = "account",
-            text = "Account-wide",
-            children = {}
-        })
-        
-        for _, name in ipairs(accountProfiles) do
-            local isActive = (name == activeName and "account" == activeScope)
-            local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "account", false)
-            local text = name .. " (" .. addonCount .. ")"
-            if isActive then
-                text = "✓ " .. text
-            end
-            
-            table.insert(tree[#tree].children, {
-                value = "account:" .. name,
-                text = text
-            })
-        end
-    end
-    
-    -- Add Character-specific category
-    if #charProfiles > 0 then
-        local charName = UnitName("player")
-        table.insert(tree, {
-            value = "character",
-            text = charName,
-            children = {}
-        })
-        
-        for _, name in ipairs(charProfiles) do
-            local isActive = (name == activeName and "character" == activeScope)
-            local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "character", false)
-            local text = name .. " (" .. addonCount .. ")"
-            if isActive then
-                text = "✓ " .. text
-            end
-            
-            table.insert(tree[#tree].children, {
-                value = "character:" .. name,
-                text = text
-            })
-        end
-    end
-    
-    treeGroup:SetTree(tree)
-    
-    -- Initialize tree state if not exists
-    if not self.treeStatus then
-        self.treeStatus = {
-            groups = {
-                account = true,    -- Expanded by default
-                character = true   -- Expanded by default
-            }
+    -- Initialize expanded state
+    if self.expandedCategories == nil then
+        self.expandedCategories = {
+            account = true,
+            character = true
         }
     end
     
-    -- Restore tree expanded state
-    treeGroup:SetStatusTable(self.treeStatus)
-    
-    -- Handle profile selection
-    treeGroup:SetCallback("OnGroupSelected", function(widget, event, group)
-        AddonProfiles:Printf("TreeGroup selected: %s", tostring(group))
-        
-        -- Store tree status before processing selection
-        self.treeStatus = treeGroup:GetStatusTable()
-        
-        -- Check if it's a profile (has colon) vs a category
-        if group:find(":") then
-            local scope, name = group:match("([^:]+):(.+)")
-            AddonProfiles:Printf("Selecting profile: %s (scope: %s)", name, scope)
-            self:SelectProfile(name, scope)
-        else
-            AddonProfiles:Printf("Category selected (ignored): %s", group)
-        end
+    -- Account-wide category
+    local accountHeader = AceGUI:Create("InteractiveLabel")
+    accountHeader:SetText((self.expandedCategories.account and "▼ " or "▶ ") .. "Account-wide")
+    accountHeader:SetFullWidth(true)
+    accountHeader:SetCallback("OnClick", function()
+        self.expandedCategories.account = not self.expandedCategories.account
+        self:PopulateProfileList()
     end)
+    scroll:AddChild(accountHeader)
     
-    -- Select current profile if any
-    if self.currentProfile then
-        local value = self.currentProfile.scope .. ":" .. self.currentProfile.name
-        treeGroup:SelectByValue(value)
+    -- Account profiles
+    if self.expandedCategories.account and #accountProfiles > 0 then
+        for _, name in ipairs(accountProfiles) do
+            local isActive = (name == activeName and "account" == activeScope)
+            local isSelected = self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "account"
+            local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "account", false)
+            
+            local profileBtn = AceGUI:Create("InteractiveLabel")
+            local text = "  " .. name .. " (" .. addonCount .. ")"
+            if isActive then
+                text = "  ✓ " .. name .. " (" .. addonCount .. ")"
+            end
+            profileBtn:SetText(text)
+            profileBtn:SetFullWidth(true)
+            
+            if isSelected then
+                profileBtn:SetColor(1, 0.82, 0)  -- Gold highlight
+            else
+                profileBtn:SetColor(1, 1, 1)  -- White
+            end
+            
+            profileBtn:SetCallback("OnClick", function()
+                self:SelectProfile(name, "account")
+            end)
+            
+            scroll:AddChild(profileBtn)
+        end
     end
     
-    container:AddChild(treeGroup)
+    -- Spacing
+    local spacer2 = AceGUI:Create("Label")
+    spacer2:SetText(" ")
+    spacer2:SetFullWidth(true)
+    scroll:AddChild(spacer2)
+    
+    -- Character-specific category
+    if #charProfiles > 0 then
+        local charName = UnitName("player")
+        local charHeader = AceGUI:Create("InteractiveLabel")
+        charHeader:SetText((self.expandedCategories.character and "▼ " or "▶ ") .. charName)
+        charHeader:SetFullWidth(true)
+        charHeader:SetCallback("OnClick", function()
+            self.expandedCategories.character = not self.expandedCategories.character
+            self:PopulateProfileList()
+        end)
+        scroll:AddChild(charHeader)
+        
+        -- Character profiles
+        if self.expandedCategories.character then
+            for _, name in ipairs(charProfiles) do
+                local isActive = (name == activeName and "character" == activeScope)
+                local isSelected = self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "character"
+                local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "character", false)
+                
+                local profileBtn = AceGUI:Create("InteractiveLabel")
+                local text = "  " .. name .. " (" .. addonCount .. ")"
+                if isActive then
+                    text = "  ✓ " .. name .. " (" .. addonCount .. ")"
+                end
+                profileBtn:SetText(text)
+                profileBtn:SetFullWidth(true)
+                
+                if isSelected then
+                    profileBtn:SetColor(1, 0.82, 0)  -- Gold highlight
+                else
+                    profileBtn:SetColor(1, 1, 1)  -- White
+                end
+                
+                profileBtn:SetCallback("OnClick", function()
+                    self:SelectProfile(name, "character")
+                end)
+                
+                scroll:AddChild(profileBtn)
+            end
+        end
+    end
+    
+    container:AddChild(scroll)
     self.LeftPanel:AddChild(container)
 end
 
