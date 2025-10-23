@@ -102,7 +102,7 @@ function UI:PopulateProfileList()
             local profileBtn = AceGUI:Create("InteractiveLabel")
             local text = "  " .. name .. " (" .. addonCount .. ")"
             if isActive then
-                text = "  [ACTIVE] " .. name .. " (" .. addonCount .. ")"
+                text = "  * " .. name .. " (" .. addonCount .. ")"
             end
             profileBtn:SetText(text)
             profileBtn:SetFullWidth(true)
