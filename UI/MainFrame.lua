@@ -79,6 +79,10 @@ function UI:CreateMainFrame()
         AddonProfiles:Print("Error populating UI: " .. tostring(err))
     end
     
+    -- Force layout recalculation to fix initial sizing issue
+    container:DoLayout()
+    frame:DoLayout()
+    
     -- Hide by default
     frame:Hide()
     
