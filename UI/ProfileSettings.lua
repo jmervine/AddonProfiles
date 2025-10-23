@@ -173,6 +173,15 @@ function UI:PopulateSettings()
     spacer5:SetFullWidth(true)
     container:AddChild(spacer5)
     
+    -- Copy Profile button
+    local copyBtn = AceGUI:Create("Button")
+    copyBtn:SetText("Copy Profile")
+    copyBtn:SetFullWidth(true)
+    copyBtn:SetCallback("OnClick", function()
+        self:ShowCopyProfileDialog(profileName, profileScope)
+    end)
+    container:AddChild(copyBtn)
+    
     -- Delete Profile button
     local deleteBtn = AceGUI:Create("Button")
     deleteBtn:SetText("Delete Profile")
@@ -183,6 +192,121 @@ function UI:PopulateSettings()
     container:AddChild(deleteBtn)
     
     self.RightPanel:AddChild(container)
+end
+
+function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
+    -- Create dialog for copying profile
+    local dialog = AceGUI:Create("Frame")
+    dialog:SetTitle("Copy Profile")
+    dialog:SetStatusText("Create a copy of '" .. sourceProfileName .. "'")
+    dialog:SetLayout("Flow")
+    dialog:SetWidth(400)
+    dialog:SetHeight(280)
+    
+    -- New profile name input
+    local nameLabel = AceGUI:Create("Label")
+    nameLabel:SetText("New Profile Name:")
+    nameLabel:SetFullWidth(true)
+    dialog:AddChild(nameLabel)
+    
+    local nameInput = AceGUI:Create("EditBox")
+    nameInput:SetFullWidth(true)
+    nameInput:SetText(sourceProfileName .. " Copy")
+    dialog:AddChild(nameInput)
+    
+    -- Spacing
+    local spacer = AceGUI:Create("Label")
+    spacer:SetText(" ")
+    spacer:SetFullWidth(true)
+    dialog:AddChild(spacer)
+    
+    -- Scope selection
+    local scopeLabel = AceGUI:Create("Label")
+    scopeLabel:SetText("Scope:")
+    scopeLabel:SetFullWidth(true)
+    dialog:AddChild(scopeLabel)
+    
+    local scopeDropdown = AceGUI:Create("Dropdown")
+    scopeDropdown:SetFullWidth(true)
+    scopeDropdown:SetList({
+        account = "Account-wide",
+        character = "Character-specific"
+    })
+    scopeDropdown:SetValue(sourceProfileScope)  -- Default to same scope as source
+    dialog:AddChild(scopeDropdown)
+    
+    -- Spacing
+    local spacer2 = AceGUI:Create("Label")
+    spacer2:SetText(" ")
+    spacer2:SetFullWidth(true)
+    dialog:AddChild(spacer2)
+    
+    -- Buttons
+    local btnGroup = AceGUI:Create("SimpleGroup")
+    btnGroup:SetFullWidth(true)
+    btnGroup:SetLayout("Flow")
+    
+    local createBtn = AceGUI:Create("Button")
+    createBtn:SetText("Copy")
+    createBtn:SetWidth(150)
+    createBtn:SetCallback("OnClick", function()
+        local newName = nameInput:GetText()
+        local newScope = scopeDropdown:GetValue()
+        
+        if not newName or newName == "" then
+            AddonProfiles:Print("Profile name cannot be empty.")
+            return
+        end
+        
+        -- Get source profile data
+        local sourceProfile = AddonProfiles.ProfileManager:GetProfile(sourceProfileName, sourceProfileScope)
+        if not sourceProfile then
+            AddonProfiles:Printf("Error: Source profile '%s' not found.", sourceProfileName)
+            dialog:Release()
+            return
+        end
+        
+        -- Create new profile with copied data
+        local success, err = AddonProfiles.ProfileManager:CreateProfile(newName, newScope)
+        if not success then
+            AddonProfiles:Printf("Error: %s", err)
+            return
+        end
+        
+        -- Copy all addons and settings
+        local newProfile = AddonProfiles.ProfileManager:GetProfile(newName, newScope)
+        if newProfile then
+            -- Copy addons
+            for addonName, enabled in pairs(sourceProfile.addons or {}) do
+                newProfile.addons[addonName] = enabled
+            end
+            -- Copy settings
+            newProfile.autoDependencies = sourceProfile.autoDependencies
+        end
+        
+        AddonProfiles:Printf("Created profile '%s' as a copy of '%s'.", newName, sourceProfileName)
+        
+        -- Select the new profile
+        self:SelectProfile(newName, newScope)
+        
+        dialog:Release()
+    end)
+    btnGroup:AddChild(createBtn)
+    
+    local cancelBtn = AceGUI:Create("Button")
+    cancelBtn:SetText("Cancel")
+    cancelBtn:SetWidth(150)
+    cancelBtn:SetCallback("OnClick", function()
+        dialog:Release()
+    end)
+    btnGroup:AddChild(cancelBtn)
+    
+    dialog:AddChild(btnGroup)
+    
+    -- Cleanup
+    dialog:SetCallback("OnClose", function(widget)
+        AceGUI:Release(widget)
+    end)
 end
 
 function UI:ConfirmDeleteProfile(profileName, profileScope)
