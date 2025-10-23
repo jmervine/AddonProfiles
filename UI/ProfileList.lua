@@ -80,6 +80,7 @@ function UI:PopulateProfileList()
     local accountHeader = AceGUI:Create("InteractiveLabel")
     accountHeader:SetText((self.expandedCategories.account and "[-] " or "[+] ") .. "Account-wide")
     accountHeader:SetFullWidth(true)
+    accountHeader:SetFont("GameFontNormalLarge")
     accountHeader:SetCallback("OnClick", function()
         self.expandedCategories.account = not self.expandedCategories.account
         self:PopulateProfileList()
@@ -96,10 +97,11 @@ function UI:PopulateProfileList()
             local profileBtn = AceGUI:Create("InteractiveLabel")
             local text = "  " .. name .. " (" .. addonCount .. ")"
             if isActive then
-                text = "  * " .. name .. " (" .. addonCount .. ")"
+                text = "  > " .. name .. " (" .. addonCount .. ")"
             end
             profileBtn:SetText(text)
             profileBtn:SetFullWidth(true)
+            profileBtn:SetFont("GameFontNormal")
             
             if isSelected then
                 profileBtn:SetColor(1, 0.82, 0)  -- Gold highlight
@@ -127,6 +129,7 @@ function UI:PopulateProfileList()
         local charHeader = AceGUI:Create("InteractiveLabel")
         charHeader:SetText((self.expandedCategories.character and "[-] " or "[+] ") .. charName)
         charHeader:SetFullWidth(true)
+        charHeader:SetFont("GameFontNormalLarge")
         charHeader:SetCallback("OnClick", function()
             self.expandedCategories.character = not self.expandedCategories.character
             self:PopulateProfileList()
