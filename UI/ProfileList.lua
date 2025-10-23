@@ -33,8 +33,8 @@ function UI:PopulateProfileList()
     local scopeGroup = AceGUI:Create("TabGroup")
     scopeGroup:SetFullWidth(true)
     scopeGroup:SetTabs({
-        {text="Character", value="character"},
-        {text="Account", value="account"}
+        {text="Account", value="account"},
+        {text="Character", value="character"}
     })
     scopeGroup:SetCallback("OnGroupSelected", function(widget, event, group)
         self.currentScope = group
