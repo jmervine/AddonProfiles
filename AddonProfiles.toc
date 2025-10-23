@@ -1,13 +1,18 @@
 ## Title: AddonProfiles
-## Notes: Save and load Addon enabled/disabled profiles.
+## Notes: Save and load Addon enabled/disabled profiles with UI management and dependency handling.
 ## Author: Hound @ Atiesh (WotLK)
-## Version: 0.0.3-beta1
-## SavedVariables: AddonProfilesStore
+## Version: 2.0.0-alpha1
+## SavedVariables: AddonProfilesDB, AddonProfilesStore
 ## OptionalDeps: Ace3
-## Interface: 30400
-## X-Interface: 30400
+## Interface: 11507
+## X-Interface: 11507
 
 embeds.xml
 
+AddonManager.lua
+ProfileManager.lua
 Core.lua
-Libs/AddonProfiles/UI.lua
+UI/MainFrame.lua
+UI/ProfileList.lua
+UI/AddonList.lua
+UI/ProfileSettings.lua
