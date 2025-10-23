@@ -17,41 +17,41 @@ function UI:Initialize()
 end
 
 function UI:CreateMainFrame()
-    -- Create main window
+    -- Create main window (make it resizable)
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
     frame:SetStatusText("AddonProfiles v" .. AddonProfiles.VERSION)
     frame:SetLayout("Fill")
-    frame:SetWidth(900)
-    frame:SetHeight(600)
+    frame:SetWidth(950)
+    frame:SetHeight(650)
     
     -- Store reference
     self.MainFrame = frame
     
-    -- Create main container with three columns
+    -- Create main container with three columns using relative widths
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetFullHeight(true)
     container:SetLayout("Flow")
     
-    -- Left panel (Profile List) - fixed width
+    -- Left panel (Profile List) - 27% relative width
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
-    leftPanel:SetWidth(250)
+    leftPanel:SetRelativeWidth(0.27)
     leftPanel:SetFullHeight(true)
     leftPanel:SetLayout("Fill")
     
-    -- Middle panel (Addon List) - fixed width
+    -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
     middlePanel:SetTitle("Addons")
-    middlePanel:SetWidth(400)
+    middlePanel:SetRelativeWidth(0.44)
     middlePanel:SetFullHeight(true)
     middlePanel:SetLayout("Fill")
     
-    -- Right panel (Profile Settings) - fixed width
+    -- Right panel (Profile Settings) - 27% relative width
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
-    rightPanel:SetWidth(230)
+    rightPanel:SetRelativeWidth(0.27)
     rightPanel:SetFullHeight(true)
     rightPanel:SetLayout("Fill")
     
