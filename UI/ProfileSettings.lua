@@ -316,6 +316,9 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
         self.MainFrame:Hide()
     end
     
+    -- Capture UI reference for callbacks
+    local ui = self
+    
     -- Confirmation dialog
     StaticPopupDialogs["ADDONPROFILES_DELETE_CONFIRM"] = {
         text = string.format("Delete profile '%s'?", profileName),
@@ -326,18 +329,26 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
             if success then
                 AddonProfiles:Printf("Deleted profile '%s'.", profileName)
                 -- Clear selection and refresh
-                self.currentProfile = nil
-                self:Refresh()
+                ui.currentProfile = nil
+                if wasShown then
+                    ui.MainFrame:Show()
+                    ui:Refresh()
+                end
             else
                 AddonProfiles:Printf("Error: %s", err)
-            end
-            if wasShown then
-                self.MainFrame:Show()
+                if wasShown then
+                    ui.MainFrame:Show()
+                end
             end
         end,
         OnCancel = function()
             if wasShown then
-                self.MainFrame:Show()
+                ui.MainFrame:Show()
+            end
+        end,
+        OnHide = function()
+            if wasShown and ui.MainFrame and not ui.MainFrame:IsShown() then
+                ui.MainFrame:Show()
             end
         end,
         timeout = 0,
@@ -355,6 +366,9 @@ function UI:ApplyProfile(profileName, profileScope)
         self.MainFrame:Hide()
     end
     
+    -- Capture UI reference for callbacks
+    local ui = self
+    
     -- Confirmation dialog
     StaticPopupDialogs["ADDONPROFILES_APPLY_CONFIRM"] = {
         text = string.format("Apply profile '%s'?\n\nThis will reload the UI.", profileName),
@@ -368,13 +382,18 @@ function UI:ApplyProfile(profileName, profileScope)
             else
                 AddonProfiles:Printf("Error: %s", err)
                 if wasShown then
-                    self.MainFrame:Show()
+                    ui.MainFrame:Show()
                 end
             end
         end,
         OnCancel = function()
             if wasShown then
-                self.MainFrame:Show()
+                ui.MainFrame:Show()
+            end
+        end,
+        OnHide = function()
+            if wasShown and ui.MainFrame and not ui.MainFrame:IsShown() then
+                ui.MainFrame:Show()
             end
         end,
         timeout = 0,
