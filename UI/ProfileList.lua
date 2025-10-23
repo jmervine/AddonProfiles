@@ -119,8 +119,24 @@ function UI:PopulateProfileList()
     
     treeGroup:SetTree(tree)
     
+    -- Initialize tree state if not exists
+    if not self.treeStatus then
+        self.treeStatus = {
+            groups = {
+                account = true,    -- Expanded by default
+                character = true   -- Expanded by default
+            }
+        }
+    end
+    
+    -- Restore tree expanded state
+    treeGroup:SetStatusTable(self.treeStatus)
+    
     -- Handle profile selection
     treeGroup:SetCallback("OnGroupSelected", function(widget, event, group)
+        -- Store tree status before processing selection
+        self.treeStatus = treeGroup:GetStatusTable()
+        
         -- Check if it's a profile (has colon) vs a category
         if group:find(":") then
             local scope, name = group:match("([^:]+):(.+)")
