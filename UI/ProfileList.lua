@@ -29,37 +29,6 @@ function UI:PopulateProfileList()
     container:SetFullHeight(true)
     container:SetLayout("List")
     
-    -- Scope selector (buttons side-by-side like tabs)
-    local scopeGroup = AceGUI:Create("SimpleGroup")
-    scopeGroup:SetFullWidth(true)
-    scopeGroup:SetLayout("Flow")
-    
-    local acctButton = AceGUI:Create("Button")
-    acctButton:SetText("Account")
-    acctButton:SetWidth(120)
-    acctButton:SetCallback("OnClick", function()
-        self.currentScope = "account"
-        self:PopulateProfileList()
-    end)
-    if self.currentScope == "account" then
-        acctButton:SetDisabled(true)
-    end
-    
-    local charButton = AceGUI:Create("Button")
-    charButton:SetText("Character")
-    charButton:SetWidth(120)
-    charButton:SetCallback("OnClick", function()
-        self.currentScope = "character"
-        self:PopulateProfileList()
-    end)
-    if self.currentScope == "character" then
-        charButton:SetDisabled(true)
-    end
-    
-    scopeGroup:AddChild(acctButton)
-    scopeGroup:AddChild(charButton)
-    container:AddChild(scopeGroup)
-    
     -- New Profile button
     local newButton = AceGUI:Create("Button")
     newButton:SetText("New Profile")
@@ -68,6 +37,13 @@ function UI:PopulateProfileList()
         self:ShowNewProfileDialog()
     end)
     container:AddChild(newButton)
+    
+    -- Legend label
+    local legendLabel = AceGUI:Create("Label")
+    legendLabel:SetText("[A]=Account  [C]=Character")
+    legendLabel:SetFullWidth(true)
+    legendLabel:SetColor(0.7, 0.7, 0.7)
+    container:AddChild(legendLabel)
     
     -- Spacing
     local spacer1 = AceGUI:Create("Label")
@@ -80,8 +56,8 @@ function UI:PopulateProfileList()
     scroll:SetFullWidth(true)
     scroll:SetLayout("List")
     
-    -- Get profiles for current scope
-    local profiles = AddonProfiles.ProfileManager:GetAllProfiles(self.currentScope)
+    -- Get all profiles (both account and character)
+    local profiles = AddonProfiles.ProfileManager:GetAllProfiles("all")
     
     -- Get active profile
     local activeName, activeScope = AddonProfiles.ProfileManager:GetActiveProfile()
@@ -108,10 +84,11 @@ function UI:PopulateProfileList()
             profileRow:SetFullWidth(true)
             profileRow:SetLayout("Flow")
             
-            -- Profile select button
+            -- Profile select button with scope indicator
             local selectBtn = AceGUI:Create("Button")
             local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, profile.scope, false)
-            local btnText = name
+            local scopeLabel = profile.scope == "account" and "[A]" or "[C]"
+            local btnText = scopeLabel .. " " .. name
             if isActive then
                 btnText = "✓ " .. btnText
             end

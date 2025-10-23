@@ -8,7 +8,6 @@ AddonProfiles.UI = AddonProfiles.UI or {}
 local UI = AddonProfiles.UI
 
 UI.currentProfile = nil -- { name = "...", scope = "..." }
-UI.currentScope = "account" -- Filter for profile list (default to account)
 
 function UI:Initialize()
     -- Just set up namespace, don't create frame yet
