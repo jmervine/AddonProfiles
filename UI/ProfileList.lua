@@ -101,16 +101,15 @@ function UI:PopulateProfileList()
             
             local profileBtn = AceGUI:Create("InteractiveLabel")
             local text = "  " .. name .. " (" .. addonCount .. ")"
-            if isActive then
-                text = "  * " .. name .. " (" .. addonCount .. ")"
-            end
             profileBtn:SetText(text)
             profileBtn:SetFullWidth(true)
             
             if isSelected then
-                profileBtn:SetColor(1, 0.82, 0)  -- Gold highlight
+                profileBtn:SetColor(1, 0.82, 0)  -- Gold = Selected for editing
+            elseif isActive then
+                profileBtn:SetColor(0, 1, 0)  -- Green = Active/Applied
             else
-                profileBtn:SetColor(1, 1, 1)  -- White
+                profileBtn:SetColor(1, 1, 1)  -- White = Normal
             end
             
             profileBtn:SetCallback("OnClick", function()
