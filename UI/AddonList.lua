@@ -50,16 +50,7 @@ function UI:PopulateAddonList()
     end)
     container:AddChild(searchBox)
     
-    -- Filter checkbox
-    local filterCheck = AceGUI:Create("CheckBox")
-    filterCheck:SetLabel("Show only compatible")
-    filterCheck:SetValue(self.showOnlyCompatible)
-    filterCheck:SetFullWidth(true)
-    filterCheck:SetCallback("OnValueChanged", function(widget, event, value)
-        self.showOnlyCompatible = value
-        self:PopulateAddonList()
-    end)
-    container:AddChild(filterCheck)
+    -- Removed "Show only compatible" filter - not useful in practice
     
     -- Select All / Deselect All buttons
     local btnGroup = AceGUI:Create("SimpleGroup")
@@ -152,11 +143,6 @@ function UI:PopulateAddonList()
                        info.title:lower():find(searchLower, 1, true)) then
                     showAddon = false
                 end
-            end
-            
-            -- Compatible filter
-            if self.showOnlyCompatible and not info.loadable then
-                showAddon = false
             end
             
             if showAddon then
