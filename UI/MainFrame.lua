@@ -11,10 +11,9 @@ UI.currentProfile = nil -- { name = "...", scope = "..." }
 UI.currentScope = "character" -- Filter for profile list
 
 function UI:Initialize()
-    -- Create main frame on first call
-    if not self.MainFrame then
-        self:CreateMainFrame()
-    end
+    -- Just set up namespace, don't create frame yet
+    -- Frame will be created lazily when Show() is called
+    self.initialized = true
 end
 
 function UI:CreateMainFrame()
@@ -69,10 +68,16 @@ function UI:CreateMainFrame()
     -- Add container to main frame
     frame:AddChild(container)
     
-    -- Populate panels
-    self:PopulateProfileList()
-    self:PopulateAddonList()
-    self:PopulateSettings()
+    -- Populate panels (with error handling)
+    local success, err = pcall(function()
+        self:PopulateProfileList()
+        self:PopulateAddonList()
+        self:PopulateSettings()
+    end)
+    
+    if not success then
+        AddonProfiles:Print("Error populating UI: " .. tostring(err))
+    end
     
     -- Hide by default
     frame:Hide()
@@ -96,9 +101,20 @@ function UI:Refresh()
         return
     end
     
-    self:PopulateProfileList()
-    self:PopulateAddonList()
-    self:PopulateSettings()
+    -- Only refresh if panels exist
+    if not self.LeftPanel or not self.MiddlePanel or not self.RightPanel then
+        return
+    end
+    
+    local success, err = pcall(function()
+        self:PopulateProfileList()
+        self:PopulateAddonList()
+        self:PopulateSettings()
+    end)
+    
+    if not success then
+        AddonProfiles:Print("Error refreshing UI: " .. tostring(err))
+    end
 end
 
 function UI:SelectProfile(name, scope)
@@ -123,6 +139,6 @@ function UI:GetSelectedProfile()
     return nil
 end
 
--- Initialize UI when addon loads
-AddonProfiles.UI:Initialize()
+-- Note: UI initialization is now handled in Core.lua OnEnable()
+-- Do NOT initialize here as it's too early in the load process
 

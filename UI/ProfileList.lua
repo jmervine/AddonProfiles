@@ -6,7 +6,18 @@ local AceGUI = LibStub("AceGUI-3.0")
 local UI = AddonProfiles.UI
 
 function UI:PopulateProfileList()
+    -- Safety checks
     if not self.LeftPanel then
+        return
+    end
+    
+    if not AddonProfiles.db then
+        AddonProfiles:Print("Database not initialized")
+        return
+    end
+    
+    if not AddonProfiles.ProfileManager then
+        AddonProfiles:Print("ProfileManager not loaded")
         return
     end
     

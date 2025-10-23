@@ -9,7 +9,13 @@ UI.searchText = ""
 UI.showOnlyCompatible = false
 
 function UI:PopulateAddonList()
+    -- Safety checks
     if not self.MiddlePanel then
+        return
+    end
+    
+    if not AddonProfiles.AddonManager then
+        AddonProfiles:Print("AddonManager not loaded")
         return
     end
     

@@ -6,7 +6,12 @@ local AceGUI = LibStub("AceGUI-3.0")
 local UI = AddonProfiles.UI
 
 function UI:PopulateSettings()
+    -- Safety checks
     if not self.RightPanel then
+        return
+    end
+    
+    if not AddonProfiles.ProfileManager or not AddonProfiles.AddonManager then
         return
     end
     

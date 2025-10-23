@@ -34,7 +34,15 @@ function AddonProfiles:OnInitialize()
 end
 
 function AddonProfiles:OnEnable()
-    -- Additional setup when addon is fully loaded
+    -- Initialize UI namespace (but don't create the frame yet)
+    if not self.UI then
+        self.UI = {}
+    end
+    
+    -- Initialize UI module (sets up namespace only)
+    if self.UI.Initialize then
+        self.UI:Initialize()
+    end
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
@@ -297,10 +305,19 @@ function AddonProfiles:DeleteProfile(name)
 end
 
 function AddonProfiles:OpenUI()
-    if self.UI and self.UI.MainFrame then
-        self.UI.MainFrame:Show()
-    else
-        self:Print("UI not yet loaded. This is a work in progress.")
-        self:ShowHelp()
+    -- Ensure UI module exists
+    if not self.UI or not self.UI.Show then
+        self:Print("Error: UI module not loaded")
+        return
+    end
+    
+    -- Call Show() which handles lazy frame creation
+    local success, err = pcall(function()
+        self.UI:Show()
+    end)
+    
+    if not success then
+        self:Print("Error opening UI: " .. tostring(err))
+        self:Print("Please report this error with /bugreport")
     end
 end
