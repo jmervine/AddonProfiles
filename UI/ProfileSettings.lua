@@ -167,10 +167,70 @@ function UI:PopulateSettings()
     end)
     container:AddChild(captureBtn)
     
+    -- Spacing
+    local spacer5 = AceGUI:Create("Label")
+    spacer5:SetText(" ")
+    spacer5:SetFullWidth(true)
+    container:AddChild(spacer5)
+    
+    -- Delete Profile button
+    local deleteBtn = AceGUI:Create("Button")
+    deleteBtn:SetText("Delete Profile")
+    deleteBtn:SetFullWidth(true)
+    deleteBtn:SetCallback("OnClick", function()
+        self:ConfirmDeleteProfile(profileName, profileScope)
+    end)
+    container:AddChild(deleteBtn)
+    
     self.RightPanel:AddChild(container)
 end
 
+function UI:ConfirmDeleteProfile(profileName, profileScope)
+    -- Temporarily hide main frame so dialog appears on top
+    local wasShown = self.MainFrame and self.MainFrame:IsShown()
+    if wasShown then
+        self.MainFrame:Hide()
+    end
+    
+    -- Confirmation dialog
+    StaticPopupDialogs["ADDONPROFILES_DELETE_CONFIRM"] = {
+        text = string.format("Delete profile '%s'?", profileName),
+        button1 = "Delete",
+        button2 = "Cancel",
+        OnAccept = function()
+            local success, err = AddonProfiles.ProfileManager:DeleteProfile(profileName, profileScope)
+            if success then
+                AddonProfiles:Printf("Deleted profile '%s'.", profileName)
+                -- Clear selection and refresh
+                self.currentProfile = nil
+                self:Refresh()
+            else
+                AddonProfiles:Printf("Error: %s", err)
+            end
+            if wasShown then
+                self.MainFrame:Show()
+            end
+        end,
+        OnCancel = function()
+            if wasShown then
+                self.MainFrame:Show()
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = STATICPOPUP_NUMDIALOGS
+    }
+    StaticPopup_Show("ADDONPROFILES_DELETE_CONFIRM")
+end
+
 function UI:ApplyProfile(profileName, profileScope)
+    -- Temporarily hide main frame so dialog appears on top
+    local wasShown = self.MainFrame and self.MainFrame:IsShown()
+    if wasShown then
+        self.MainFrame:Hide()
+    end
+    
     -- Confirmation dialog
     StaticPopupDialogs["ADDONPROFILES_APPLY_CONFIRM"] = {
         text = string.format("Apply profile '%s'?\n\nThis will reload the UI.", profileName),
@@ -183,12 +243,20 @@ function UI:ApplyProfile(profileName, profileScope)
                 ReloadUI()
             else
                 AddonProfiles:Printf("Error: %s", err)
+                if wasShown then
+                    self.MainFrame:Show()
+                end
+            end
+        end,
+        OnCancel = function()
+            if wasShown then
+                self.MainFrame:Show()
             end
         end,
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
-        preferredIndex = 3
+        preferredIndex = STATICPOPUP_NUMDIALOGS
     }
     StaticPopup_Show("ADDONPROFILES_APPLY_CONFIRM")
 end

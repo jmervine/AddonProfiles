@@ -95,7 +95,7 @@ function UI:PopulateProfileList()
             btnText = btnText .. " (" .. addonCount .. ")"
             
             selectBtn:SetText(btnText)
-            selectBtn:SetWidth(180)
+            selectBtn:SetFullWidth(true)
             selectBtn:SetCallback("OnClick", function()
                 self:SelectProfile(name, profile.scope)
             end)
@@ -106,15 +106,6 @@ function UI:PopulateProfileList()
             end
             
             profileRow:AddChild(selectBtn)
-            
-            -- Delete button
-            local delBtn = AceGUI:Create("Button")
-            delBtn:SetText("X")
-            delBtn:SetWidth(30)
-            delBtn:SetCallback("OnClick", function()
-                self:ConfirmDeleteProfile(name, profile.scope)
-            end)
-            profileRow:AddChild(delBtn)
             
             scroll:AddChild(profileRow)
         end
@@ -158,10 +149,10 @@ function UI:ShowNewProfileDialog()
     local scopeDropdown = AceGUI:Create("Dropdown")
     scopeDropdown:SetFullWidth(true)
     scopeDropdown:SetList({
-        character = "Character-specific",
-        account = "Account-wide"
+        account = "Account-wide",
+        character = "Character-specific"
     })
-    scopeDropdown:SetValue(self.currentScope)
+    scopeDropdown:SetValue("account")  -- Default to account-wide
     dialog:AddChild(scopeDropdown)
     
     -- Spacing
@@ -216,29 +207,5 @@ function UI:ShowNewProfileDialog()
     end)
 end
 
-function UI:ConfirmDeleteProfile(name, scope)
-    -- Simple confirmation dialog
-    StaticPopupDialogs["ADDONPROFILES_DELETE_CONFIRM"] = {
-        text = string.format("Delete profile '%s'?", name),
-        button1 = "Delete",
-        button2 = "Cancel",
-        OnAccept = function()
-            local success, err = AddonProfiles.ProfileManager:DeleteProfile(name, scope)
-            if success then
-                AddonProfiles:Printf("Deleted profile '%s'.", name)
-                if self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == scope then
-                    self.currentProfile = nil
-                end
-                self:Refresh()
-            else
-                AddonProfiles:Printf("Error: %s", err)
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3
-    }
-    StaticPopup_Show("ADDONPROFILES_DELETE_CONFIRM")
-end
+-- ConfirmDeleteProfile moved to ProfileSettings.lua
 
