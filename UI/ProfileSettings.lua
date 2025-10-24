@@ -222,6 +222,16 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     dialog:SetWidth(400)
     dialog:SetHeight(250)
     
+    -- Hide status bar and close button
+    if dialog.frame then
+        if dialog.frame.statusbg then
+            dialog.frame.statusbg:Hide()
+        end
+        if dialog.closebutton then
+            dialog.closebutton:Hide()
+        end
+    end
+    
     -- New profile name input
     local nameLabel = AceGUI:Create("Label")
     nameLabel:SetText("New Profile Name:")
@@ -346,6 +356,16 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
     dialog:SetWidth(350)
     dialog:SetHeight(150)
     
+    -- Hide status bar and close button
+    if dialog.frame then
+        if dialog.frame.statusbg then
+            dialog.frame.statusbg:Hide()
+        end
+        if dialog.closebutton then
+            dialog.closebutton:Hide()
+        end
+    end
+    
     -- Confirmation message
     local message = AceGUI:Create("Label")
     message:SetText(string.format("Delete profile '%s'?", profileName))
@@ -403,6 +423,16 @@ function UI:ApplyProfile(profileName, profileScope)
     dialog:SetLayout("Flow")
     dialog:SetWidth(350)
     dialog:SetHeight(180)
+    
+    -- Hide status bar and close button
+    if dialog.frame then
+        if dialog.frame.statusbg then
+            dialog.frame.statusbg:Hide()
+        end
+        if dialog.closebutton then
+            dialog.closebutton:Hide()
+        end
+    end
     
     -- Confirmation message
     local message = AceGUI:Create("Label")

@@ -78,6 +78,14 @@ function AddonProfiles:AddGameMenuButton()
                 local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
                 button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
             end
+            
+            -- Apply ElvUI skin if available
+            if IsAddOnLoaded("ElvUI") then
+                local E = _G.ElvUI and _G.ElvUI[1]
+                if E and E.Skins then
+                    E.Skins:HandleButton(button)
+                end
+            end
         end
         
         if GameMenuButtonAddonProfiles then
