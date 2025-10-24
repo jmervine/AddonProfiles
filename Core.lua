@@ -1,243 +1,321 @@
--- Build "AddonProfiles" addon.
+-- Core.lua
+-- Main addon initialization and setup
+
+-- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.DefaultProfile = string.format("%s@Default", UnitName("player"))
+AddonProfiles.VERSION = "2.0.0-alpha1"
+
+-- Database defaults
+local defaults = {
+    global = {
+        activeProfile = nil,
+        profiles = {}
+    },
+    char = {
+        activeProfile = nil,
+        profiles = {}
+    }
+}
 
 function AddonProfiles:OnInitialize()
-  if not AddonProfilesStore or next(AddonProfilesStore) == nil then
-    AddonProfilesStore = {
-      [self.DefaultProfile] = self:getAddons()
-    }
-  end
-
-  if self.LibsUI then
-    self:InitializeUI()
-  end
-
-  self:Print("Welcome! Type '/addonprofiles' to get started.")
+    -- Initialize AceDB
+    self.db = LibStub("AceDB-3.0"):New("AddonProfilesDB", defaults, true)
+    
+    -- Migrate old data if present
+    self:MigrateOldData()
+    
+    -- Register slash commands
+    self:RegisterChatCommand("addonprofiles", "SlashHandler")
+    self:RegisterChatCommand("ap", "SlashHandler")
+    
+    -- Print welcome message
+    self:Print(string.format("v%s loaded! Type '/ap' or '/addonprofiles' to open the UI.", self.VERSION))
 end
 
-
-AddonProfiles.SlashCommands = "addonprofiles"
-AddonProfiles.SlashAliases = { "ap", "addons" }
-
-AddonProfiles.HelpMessages = {
-  ["help"] = {
-    desc = "Show help message.",
-    opts = "[SUBCOMMAND]"
-  },
-  ["addons"] = {
-    desc = "List currently enabled Addons.",
-    opts = ""
-  },
-  ["show"] = {
-    desc = "Show saved profile or profiles.",
-    opts = "[PROFILE]"
-  },
-  ["load"] = {
-    desc = "Load saved 'PROFILE'.",
-    opts = "PROFILE"
-  },
-  ["save"] = {
-    desc = "Saved current Addon state as 'PROFILE'.",
-    opts = "PROFILE"
-  },
-  ["delete"] = {
-    desc = "Delete saved 'PROFILE'.",
-    opts = "PROFILE"
-  }
-}
-table.sort(AddonProfiles.HelpMessages)
-
-AddonProfiles:RegisterChatCommand(AddonProfiles.SlashCommands, "SlashHandler")
-for _, c in ipairs(AddonProfiles.SlashAliases) do
-  AddonProfiles:RegisterChatCommand(c, "SlashHandler")
+function AddonProfiles:OnEnable()
+    -- Initialize UI namespace (but don't create the frame yet)
+    if not self.UI then
+        self.UI = {}
+    end
+    
+    -- Initialize UI module (sets up namespace only)
+    if self.UI.Initialize then
+        self.UI:Initialize()
+    end
 end
 
+-- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
+function AddonProfiles:MigrateOldData()
+    if not AddonProfilesStore or next(AddonProfilesStore) == nil then
+        return -- No old data to migrate
+    end
+    
+    local migratedCount = 0
+    local playerName = UnitName("player")
+    
+    for profileName, addonList in pairs(AddonProfilesStore) do
+        -- Check if already migrated
+        if not self.db.char.profiles[profileName] then
+            -- Convert array format to map format
+            local addonMap = {}
+            for _, addonName in ipairs(addonList) do
+                addonMap[addonName] = true
+            end
+            
+            -- Create profile in character scope
+            self.db.char.profiles[profileName] = {
+                addons = addonMap,
+                autoDeps = true,
+                scope = "character",
+                created = time(),
+                migrated = true
+            }
+            
+            migratedCount = migratedCount + 1
+        end
+    end
+    
+    if migratedCount > 0 then
+        self:Printf("Migrated %d profile(s) from v1 to v2 format.", migratedCount)
+    end
+end
+
+-- Slash command handler
 function AddonProfiles:SlashHandler(input)
-  -- handle no input
-  if not input or input == "" then
-    self:Help()
-    return
-  end
-
-  -- handle single input
-  if input == "help" then
-    self:Help()
-  elseif input == "show" then
-    self:ShowAll()
-  elseif input == "addons" then
-    self:Addons()
-  elseif input == "save" then
-    self:Save(self.DefaultProfile)
-  elseif input == "load" then
-    self:Print("'load' requires a profile argument.")
-  elseif input == "delete" then
-    self:Print("'delete' requires a profile argument.")
-  else
-
-    -- handle multiple input
-    local cmd, input = self:GetArgs(input, 2, 1)
-
-    if cmd == "load" then
-      self:Load(input)
+    if not input or input == "" then
+        self:OpenUI()
+        return
+    end
+    
+    -- Parse command and arguments
+    local args = {}
+    for word in input:gmatch("%S+") do
+        table.insert(args, word)
+    end
+    
+    local cmd = args[1]
+    
+    if cmd == "help" then
+        self:ShowHelp()
     elseif cmd == "show" then
-      self:ShowOne(input)
+        if args[2] then
+            self:ShowProfile(args[2])
+        else
+            self:ShowAllProfiles()
+        end
+    elseif cmd == "load" then
+        if not args[2] then
+            self:Print("Usage: /ap load <profile>")
+            return
+        end
+        self:LoadProfile(args[2])
     elseif cmd == "save" then
-      self:Save(input)
+        if not args[2] then
+            self:Print("Usage: /ap save <profile>")
+            return
+        end
+        self:SaveProfile(args[2])
+    elseif cmd == "new" then
+        if not args[2] then
+            self:Print("Usage: /ap new <profile> [account|char]")
+            return
+        end
+        local scope = args[3] == "account" and "account" or "character"
+        self:NewProfile(args[2], scope)
     elseif cmd == "delete" then
-      self:Delete(input)
+        if not args[2] then
+            self:Print("Usage: /ap delete <profile>")
+            return
+        end
+        self:DeleteProfile(args[2])
+    elseif cmd == "ui" then
+        self:OpenUI()
     else
-      self:Help()
+        self:ShowHelp()
     end
-
-  end
-
-  return
 end
 
-function AddonProfiles:Help()
-  self:OpenOptions()
-
-  return
+-- Command implementations
+function AddonProfiles:ShowHelp()
+    self:Print("AddonProfiles Commands:")
+    self:Print("  /ap or /ap ui - Open profile manager UI")
+    self:Print("  /ap show [profile] - Show all profiles or specific profile")
+    self:Print("  /ap load <profile> - Activate a profile")
+    self:Print("  /ap save <profile> - Save current addon state to profile")
+    self:Print("  /ap new <profile> [account|char] - Create new profile")
+    self:Print("  /ap delete <profile> - Delete a profile")
+    self:Print("  /ap help - Show this help")
 end
 
-function AddonProfiles:ShowOne(profile)
-  local addons = AddonProfilesStore[profile]
-
-  if addons == nil then
-    self:Printf("Profile %s not found.", profile)
-    return
-  end
-
-  self:Printf("Profile: %s", profile)
-  local astr = table.concat(addons, ", ")
-  self:Printf(" %s", astr)
-end
-
-function AddonProfiles:ShowAll()
-  local store = AddonProfilesStore
-  self:Print("Profiles:")
-
-  if store == nil or next(store) == nil then
-    self:Print("No saved profiles.")
-    return
-  end
-
-  for pname, _ in pairs(store) do
-    self:Printf(" - '%s'", pname)
-  end
-
-  return
-end
-
-function AddonProfiles:Load(input)
-  local current = self:getAddons()
-
-  local store = AddonProfilesStore
-  if store == nil or next(store) == nil then
-    self:Print("No saved profiles.")
-    return
-  end
-
-  local requested = store[input]
-  if not requested then
-    self:Print("ERROR Unknown profile.")
-    self:Print(" ")
-    self:ShowAll()
-  end
-
-  if current == requested then
-    self:Print("Requested profile is the same as current state.")
-    return
-  end
-
-  self:Print("DisableAllAddons()")
-  DisableAllAddons()
-  for _, addon in ipairs(requested) do
-    EnableAddon(addon)
-  end
-
-  self:Printf("Loaded: '%s': %s", input, table.concat(requested, ", "))
-  self:ReloadUI()
-
-  return
-end
-
-function AddonProfiles:getAddons()
-  local addons = {}
-
-  for i=1, GetNumAddOns(), 1 do
-    local name, _, _, loadable, _, _, _ = GetAddOnInfo(i)
-    local state = GetAddOnEnableState(nil, name)
-    if state > 0 or loadable then
-      table.insert(addons, name)
+function AddonProfiles:ShowAllProfiles()
+    local hasProfiles = false
+    
+    self:Print("Account-wide Profiles:")
+    for name, profile in pairs(self.db.global.profiles) do
+        local count = self.ProfileManager:GetProfileAddonCount(name, "account", false)
+        self:Printf("  %s (%d addons)", name, count)
+        hasProfiles = true
     end
-  end
-
-  return addons
+    
+    if not hasProfiles then
+        self:Print("  (none)")
+    end
+    
+    hasProfiles = false
+    self:Print("Character Profiles:")
+    for name, profile in pairs(self.db.char.profiles) do
+        local count = self.ProfileManager:GetProfileAddonCount(name, "character", false)
+        self:Printf("  %s (%d addons)", name, count)
+        hasProfiles = true
+    end
+    
+    if not hasProfiles then
+        self:Print("  (none)")
+    end
 end
 
-function AddonProfiles:Addons()
-  self:Print("Enabled Addons:")
-  for _, addon in ipairs(self:getAddons()) do
-    self:Printf(" - %s", addon)
-  end
-
-  self:Print(" ")
-  self:Print("Go to Game Menu > Addons to enable additional Addons.")
+function AddonProfiles:ShowProfile(name)
+    -- Try character scope first
+    local profile = self.ProfileManager:GetProfile(name, "character")
+    local scope = "character"
+    
+    if not profile then
+        -- Try account scope
+        profile = self.ProfileManager:GetProfile(name, "account")
+        scope = "account"
+    end
+    
+    if not profile then
+        self:Printf("Profile '%s' not found.", name)
+        return
+    end
+    
+    local count = self.ProfileManager:GetProfileAddonCount(name, scope, false)
+    local depCount = self.AddonManager:GetDependencyCount(profile.addons, profile.autoDeps)
+    
+    self:Printf("Profile: %s (%s scope)", name, scope)
+    self:Printf("  Addons: %d", count)
+    self:Printf("  Dependencies: %d", depCount)
+    self:Printf("  Auto-include deps: %s", profile.autoDeps and "Yes" or "No")
+    
+    -- List addons
+    local addonNames = {}
+    for addonName in pairs(profile.addons) do
+        table.insert(addonNames, addonName)
+    end
+    table.sort(addonNames)
+    
+    if #addonNames > 0 then
+        self:Print("  Addons in profile:")
+        for _, addonName in ipairs(addonNames) do
+            self:Printf("    - %s", addonName)
+        end
+    end
 end
 
-function AddonProfiles:saveAddonProfile(profile, addons)
-  if not AddonProfilesStore then
-    AddonProfilesStore = { [profile] = addons }
-  else
-    AddonProfilesStore[profile] = addons
-  end
-
-  return
-end
-
-function AddonProfiles:Save(input)
-  self:saveAddonProfile(input, self:getAddons())
-
-  self:Printf("Saved \"%s\": %s", input, table.concat(AddonProfilesStore[input], ", "))
-
-  return
-end
-
-function AddonProfiles:deleteProfile(input)
-  local store = AddonProfilesStore
-  AddonProfilesStore = nil
-  local removed = false
-  for profile, addons in pairs(store) do
-    if profile == input then
-      removed = true
-      self:Printf("Removed profile \"%s\"", input)
+function AddonProfiles:LoadProfile(name)
+    -- Try character scope first
+    local profile = self.ProfileManager:GetProfile(name, "character")
+    local scope = "character"
+    
+    if not profile then
+        -- Try account scope
+        profile = self.ProfileManager:GetProfile(name, "account")
+        scope = "account"
+    end
+    
+    if not profile then
+        self:Printf("Profile '%s' not found.", name)
+        return
+    end
+    
+    local success, err = self.ProfileManager:ActivateProfile(name, scope)
+    
+    if success then
+        self:Printf("Activated profile '%s'. Reloading UI...", name)
+        -- Reload UI immediately (Classic doesn't have C_Timer)
+        ReloadUI()
     else
-      self:saveAddonProfile(profile, addons)
+        self:Printf("Error activating profile: %s", err)
     end
-  end
-
-  return removed
 end
 
-function AddonProfiles:Delete(input)
-  local requested = AddonProfilesStore[input]
-  if not requested then
-    self:Print("ERROR Unknown profile.")
-    self:Print(" ")
-    self:ShowAll()
-  end
+function AddonProfiles:SaveProfile(name)
+    -- Try character scope first
+    local profile = self.ProfileManager:GetProfile(name, "character")
+    local scope = "character"
+    
+    if not profile then
+        -- Try account scope
+        profile = self.ProfileManager:GetProfile(name, "account")
+        scope = "account"
+    end
+    
+    if not profile then
+        self:Printf("Profile '%s' not found.", name)
+        return
+    end
+    
+    local success, err = self.ProfileManager:SaveCurrentState(name, scope)
+    
+    if success then
+        local count = self.ProfileManager:GetProfileAddonCount(name, scope, false)
+        self:Printf("Saved current addon state to '%s' (%d addons).", name, count)
+    else
+        self:Printf("Error saving profile: %s", err)
+    end
+end
 
-  local removed = self:deleteProfile(input)
+function AddonProfiles:NewProfile(name, scope)
+    local success, err = self.ProfileManager:CreateProfile(name, scope, {})
+    
+    if success then
+        self:Printf("Created new %s profile '%s'.", scope, name)
+    else
+        self:Printf("Error creating profile: %s", err)
+    end
+end
 
-  self:Print(" ")
-  if removed then
-    self:ShowAll()
-  else
-    self:Printf("No profiles were removed.")
-  end
+function AddonProfiles:DeleteProfile(name)
+    -- Try character scope first
+    local profile = self.ProfileManager:GetProfile(name, "character")
+    local scope = "character"
+    
+    if not profile then
+        -- Try account scope
+        profile = self.ProfileManager:GetProfile(name, "account")
+        scope = "account"
+    end
+    
+    if not profile then
+        self:Printf("Profile '%s' not found.", name)
+        return
+    end
+    
+    local success, err = self.ProfileManager:DeleteProfile(name, scope)
+    
+    if success then
+        self:Printf("Deleted profile '%s'.", name)
+    else
+        self:Printf("Error deleting profile: %s", err)
+    end
+end
 
-  return
+function AddonProfiles:OpenUI()
+    -- Ensure UI module exists
+    if not self.UI or not self.UI.Show then
+        self:Print("Error: UI module not loaded")
+        return
+    end
+    
+    -- Call Show() which handles lazy frame creation
+    local success, err = pcall(function()
+        self.UI:Show()
+    end)
+    
+    if not success then
+        self:Print("Error opening UI: " .. tostring(err))
+        self:Print("Please report this error with /bugreport")
+    end
 end

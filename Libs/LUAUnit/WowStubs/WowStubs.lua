@@ -10,7 +10,8 @@ wowAddonsStub = {
     notes    = "Test Addon Sub #1 Note",
     loadable = 1,
     reason   = nil,
-    security = "INSECURE" -- default for all non Bliz addons
+    security = "INSECURE", -- default for all non Bliz addons
+    dependencies = {} -- no dependencies
   },
   [2] = {
     _enabled = false, -- non-Bliz public state, using for testing.
@@ -19,7 +20,8 @@ wowAddonsStub = {
     notes    = "Test Addon Sub #2 Note",
     loadable = 1,
     reason   = nil,
-    security = "INSECURE" -- default for all non Bliz addons
+    security = "INSECURE", -- default for all non Bliz addons
+    dependencies = { "TestAddon_One" } -- depends on TestAddon_One
   },
   [3] = {
     _enabled = false, -- non-Bliz public state, using for testing.
@@ -28,7 +30,8 @@ wowAddonsStub = {
     notes    = "Test Addon Sub #3 Note",
     loadable = nil,
     reason   = "MISSING",
-    security = "INSECURE" -- default for all non Bliz addons
+    security = "INSECURE", -- default for all non Bliz addons
+    dependencies = {}
   }
 }
 
@@ -43,6 +46,46 @@ wowAddonProfiles = {
 -- ref: https://wowwiki-archive.fandom.com/wiki/API_UnitName
 function UnitName(_)
   return "TestCharacter"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetRealmName
+function GetRealmName()
+  return "TestRealm"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_UnitClass
+function UnitClass(unit)
+  return "Warrior", "WARRIOR"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_UnitRace
+function UnitRace(unit)
+  return "Human", "Human"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_UnitFactionGroup
+function UnitFactionGroup(unit)
+  return "Alliance", "Alliance"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetLocale
+function GetLocale()
+  return "enUS"
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetCurrentRegion
+function GetCurrentRegion()
+  return 1 -- US region
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetCVar
+function GetCVar(cvar)
+  return nil
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetBuildInfo
+function GetBuildInfo()
+  return "1.15.7", "12345", "Oct 10 2024", 11507
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnInfo
@@ -115,6 +158,38 @@ function DisableAllAddOns()
   for i, _ in pairs(wowAddonsStub) do
     wowAddonsStub[i]._enabled = false
   end
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnDependencies
+function GetAddOnDependencies(index)
+  local addon = wowAddonsStub[index]
+  if not addon or not addon.dependencies or #addon.dependencies == 0 then
+    return -- Return nothing if no dependencies
+  end
+  
+  -- Use table.unpack for Lua 5.2+ or unpack for Lua 5.1
+  local unpack_func = table.unpack or unpack
+  return unpack_func(addon.dependencies)
+end
+
+-- Stub for C_Timer (used in Core.lua)
+C_Timer = C_Timer or {}
+function C_Timer.After(delay, callback)
+  -- In tests, execute immediately
+  if callback then
+    callback()
+  end
+end
+
+-- Stub for ReloadUI
+function ReloadUI()
+  -- In tests, do nothing
+  print("ReloadUI() called (stub)")
+end
+
+-- Stub for time()
+function time()
+  return os.time()
 end
 
 -- support ace

@@ -7,6 +7,14 @@ TestStubs = {} --class
   end
 
   function TestStubs:test_wowstubs_AddonProfilesStore()
+    -- Note: Tests may clear AddonProfilesStore, so we reinitialize if needed
+    if not AddonProfilesStore then
+      -- Reload the saved variables
+      AddonProfilesStore = {
+        ["Default"] = { "TestAddOn_One" },
+        ["TestCharacter@Raiding"] = { "TestAddOn_One", "TestAddOn_Two" }
+      }
+    end
     lu.assertFalse(AddonProfilesStore == nil)
     lu.assertFalse(next(AddonProfilesStore) == nil)
   end
