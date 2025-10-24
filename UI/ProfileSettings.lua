@@ -278,8 +278,18 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
             return
         end
         
-        -- Get source profile data
-        local sourceProfile = AddonProfiles.ProfileManager:GetProfile(sourceProfileName, sourceProfileScope)
+        -- Get source profile data (may be from another character)
+        local sourceProfile
+        if self.currentProfile.charKey and self.currentProfile.scope == "character" then
+            -- Fetch from other character's database
+            if AddonProfiles.db.sv.char and AddonProfiles.db.sv.char[self.currentProfile.charKey] then
+                sourceProfile = AddonProfiles.db.sv.char[self.currentProfile.charKey].profiles[sourceProfileName]
+            end
+        else
+            -- Fetch from current character using ProfileManager
+            sourceProfile = AddonProfiles.ProfileManager:GetProfile(sourceProfileName, sourceProfileScope)
+        end
+        
         if not sourceProfile then
             AddonProfiles:Printf("Error: Source profile '%s' not found.", sourceProfileName)
             dialog:Release()
@@ -301,7 +311,7 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
                 newProfile.addons[addonName] = enabled
             end
             -- Copy settings
-            newProfile.autoDependencies = sourceProfile.autoDependencies
+            newProfile.autoDeps = sourceProfile.autoDeps
         end
         
         AddonProfiles:Printf("Created profile '%s' as a copy of '%s'.", newName, sourceProfileName)
