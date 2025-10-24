@@ -29,6 +29,16 @@ function UI:PopulateProfileList()
     container:SetFullHeight(true)
     container:SetLayout("List")
     
+    -- General Settings button
+    local settingsButton = AceGUI:Create("Button")
+    settingsButton:SetText("General Settings")
+    settingsButton:SetFullWidth(true)
+    settingsButton:SetCallback("OnClick", function()
+        self.currentProfile = nil
+        self:Refresh()
+    end)
+    container:AddChild(settingsButton)
+    
     -- New Profile button
     local newButton = AceGUI:Create("Button")
     newButton:SetText("New Profile")
