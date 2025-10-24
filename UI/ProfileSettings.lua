@@ -268,7 +268,7 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     
     local createBtn = AceGUI:Create("Button")
     createBtn:SetText("Copy")
-    createBtn:SetWidth(150)
+    createBtn:SetFullWidth(true)
     createBtn:SetCallback("OnClick", function()
         local newName = nameInput:GetText()
         local newScope = scopeDropdown:GetValue()
@@ -322,14 +322,6 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
         dialog:Release()
     end)
     btnGroup:AddChild(createBtn)
-    
-    local cancelBtn = AceGUI:Create("Button")
-    cancelBtn:SetText("Cancel")
-    cancelBtn:SetWidth(150)
-    cancelBtn:SetCallback("OnClick", function()
-        dialog:Release()
-    end)
-    btnGroup:AddChild(cancelBtn)
     
     dialog:AddChild(btnGroup)
     
