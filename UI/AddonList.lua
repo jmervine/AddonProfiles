@@ -87,7 +87,6 @@ function UI:PopulateAddonList()
         end
         
         self:RefreshAddonList()
-        self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(selectAllBtn)
     
@@ -99,7 +98,6 @@ function UI:PopulateAddonList()
         if not profile then return end
         profile.addons = {}
         self:RefreshAddonList()
-        self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(deselectAllBtn)
     
@@ -122,7 +120,7 @@ function UI:PopulateAddonList()
 end
 
 function UI:RefreshAddonList()
-    if not self.addonListContainer then
+    if not self.addonListScroll then
         return
     end
     
@@ -133,21 +131,10 @@ function UI:RefreshAddonList()
         return
     end
     
-    -- Remove existing scroll frame if present
-    if self.addonListScroll then
-        self.addonListContainer:ReleaseChildren()
-        
-        -- Re-add search box, buttons, and spacer
-        self.addonListContainer:AddChild(self.addonListSearchBox)
-        self.addonListContainer:AddChild(self.addonListButtonGroup)
-        self.addonListContainer:AddChild(self.addonListSpacer)
-    end
+    -- Clear only the scroll frame contents, not the whole container
+    self.addonListScroll:ReleaseChildren()
     
-    -- Create new scroll frame
-    local scroll = AceGUI:Create("ScrollFrame")
-    scroll:SetFullWidth(true)
-    scroll:SetLayout("List")
-    self.addonListScroll = scroll
+    local scroll = self.addonListScroll
     
     -- Get all addons
     local allAddons = AddonProfiles.AddonManager:GetAllAddons()
@@ -215,8 +202,7 @@ function UI:RefreshAddonList()
                 if not isReadOnly then
                     checkbox:SetCallback("OnValueChanged", function(widget, event, value)
                         profile.addons[name] = value or nil
-                        -- Only update settings panel, not entire addon list (prevents scroll jump)
-                        self:PopulateSettings() -- Update dep count
+                        -- Note: Settings panel will update when user saves or performs other actions
                     end)
                 end
                 
@@ -231,7 +217,5 @@ function UI:RefreshAddonList()
         noAddons:SetFullWidth(true)
         scroll:AddChild(noAddons)
     end
-    
-    self.addonListContainer:AddChild(scroll)
 end
 
