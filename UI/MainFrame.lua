@@ -20,7 +20,7 @@ function UI:CreateMainFrame()
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
     frame:SetStatusText("AddonProfiles v" .. AddonProfiles.VERSION)
-    frame:SetLayout("Fill")
+    frame:SetLayout("List")  -- Changed from Fill to List to support multiple vertical children
     frame:SetWidth(950)
     frame:SetHeight(650)
     

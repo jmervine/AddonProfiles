@@ -214,51 +214,6 @@ function UI:PopulateSettings()
     self.RightPanel:AddChild(container)
 end
 
--- Add general settings section (always shown at bottom of settings panel)
-function UI:AddGeneralSettingsSection(container)
-    -- Separator
-    local spacerSep = AceGUI:Create("Label")
-    spacerSep:SetText(" ")
-    spacerSep:SetFullWidth(true)
-    container:AddChild(spacerSep)
-    
-    -- Divider line
-    local divider = AceGUI:Create("Label")
-    divider:SetText("|cFF808080" .. string.rep("─", 40) .. "|r")
-    divider:SetFullWidth(true)
-    container:AddChild(divider)
-    
-    -- General Settings header
-    local header = AceGUI:Create("Label")
-    header:SetText("|cFFFFD700General Settings|r")
-    header:SetFullWidth(true)
-    header:SetFontObject(GameFontNormal)
-    container:AddChild(header)
-    
-    local spacer1 = AceGUI:Create("Label")
-    spacer1:SetText(" ")
-    spacer1:SetFullWidth(true)
-    container:AddChild(spacer1)
-    
-    -- Hide default AddOns button setting
-    local hideDefaultCheckbox = AceGUI:Create("CheckBox")
-    hideDefaultCheckbox:SetLabel("Hide default AddOns menu button")
-    hideDefaultCheckbox:SetFullWidth(true)
-    hideDefaultCheckbox:SetValue(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
-    hideDefaultCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
-        AddonProfiles.db.global.settings.hideDefaultAddonsButton = value
-        AddonProfiles:RefreshGameMenuButton()
-        AddonProfiles:Print(value and "Default AddOns button hidden" or "Default AddOns button visible")
-    end)
-    container:AddChild(hideDefaultCheckbox)
-    
-    local helpText = AceGUI:Create("Label")
-    helpText:SetText("When enabled, hides WoW's default AddOns button in the game menu (ESC) and positions Addon Profiles in its place.")
-    helpText:SetFullWidth(true)
-    helpText:SetColor(0.6, 0.6, 0.6)
-    container:AddChild(helpText)
-end
-
 function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     -- Create dialog for copying profile
     local dialog = AceGUI:Create("Frame")
