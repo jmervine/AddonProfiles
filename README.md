@@ -162,7 +162,7 @@ When adding new functionality:
 
 **UI doesn't open**: Check for Lua errors with `/console scriptErrors 1`
 
-**Addons not enabling**: Some addons can't be enabled/disabled while in game. The profile will be applied on next UI reload.
+**AddOns not enabling**: Some AddOns can't be enabled/disabled while in game. The profile will be applied on next UI reload.
 
 **Dependencies not working**: Make sure "Auto-include dependencies" is enabled for the profile. Some addons may have optional dependencies that aren't automatically tracked.
 

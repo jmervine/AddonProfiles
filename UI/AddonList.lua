@@ -279,7 +279,7 @@ function UI:RefreshAddonList()
     
     if displayedCount == 0 then
         local noAddons = AceGUI:Create("Label")
-        noAddons:SetText("No addons match filter")
+        noAddons:SetText("No AddOns match filter")
         noAddons:SetFullWidth(true)
         scroll:AddChild(noAddons)
     end

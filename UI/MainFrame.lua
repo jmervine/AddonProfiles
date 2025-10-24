@@ -42,7 +42,7 @@ function UI:CreateMainFrame()
     
     -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
-    middlePanel:SetTitle("Addons")
+    middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
     middlePanel:SetFullHeight(true)
     middlePanel:SetLayout("Fill")

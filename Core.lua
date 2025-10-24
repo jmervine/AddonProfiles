@@ -58,7 +58,7 @@ function AddonProfiles:AddGameMenuButton()
         AddonProfiles:OpenUI()
     end)
     
-    -- Position it below the Addons button
+    -- Position it below the AddOns button
     button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
     
     -- Adjust the rest of the menu with proper spacing
@@ -216,7 +216,7 @@ function AddonProfiles:ShowProfile(name)
     local depCount = self.AddonManager:GetDependencyCount(profile.addons, profile.autoDeps)
     
     self:Printf("Profile: %s (%s scope)", name, scope)
-    self:Printf("  Addons: %d", count)
+    self:Printf("  AddOns: %d", count)
     self:Printf("  Dependencies: %d", depCount)
     self:Printf("  Auto-include deps: %s", profile.autoDeps and "Yes" or "No")
     
@@ -228,7 +228,7 @@ function AddonProfiles:ShowProfile(name)
     table.sort(addonNames)
     
     if #addonNames > 0 then
-        self:Print("  Addons in profile:")
+        self:Print("  AddOns in profile:")
         for _, addonName in ipairs(addonNames) do
             self:Printf("    - %s", addonName)
         end
