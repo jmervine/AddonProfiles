@@ -39,7 +39,7 @@ function UI:CreateMainFrame()
     
     local checkLabel = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     checkLabel:SetPoint("LEFT", checkbox, "RIGHT", 0, 0)
-    checkLabel:SetText("Hide default AddOns button")
+    checkLabel:SetText("Hide AddOns button")
     
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
