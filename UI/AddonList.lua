@@ -46,12 +46,19 @@ function UI:PopulateAddonList()
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel("Search")
     searchBox:SetFullWidth(true)
-    searchBox:SetText(self.searchText)
-    searchBox:SetCallback("OnTextChanged", function(widget, event, text)
+    searchBox:SetText(self.searchText or "")
+    searchBox.button:SetText("Search")
+    searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
         self.searchText = text
-        self:PopulateAddonList()
+        self:RefreshAddonList()
     end)
     container:AddChild(searchBox)
+    
+    -- Store references for filtering
+    self.addonListContainer = container
+    self.addonListSearchBox = searchBox
+    self.addonListProfile = profile
+    self.addonListIsReadOnly = isReadOnly
     
     -- Removed "Show only compatible" filter - not useful in practice
     
@@ -63,12 +70,14 @@ function UI:PopulateAddonList()
     local selectAllBtn = AceGUI:Create("Button")
     selectAllBtn:SetText("Select All")
     selectAllBtn:SetWidth(190)
+    selectAllBtn:SetDisabled(isReadOnly)
     selectAllBtn:SetCallback("OnClick", function()
         if not profile then return end
         
         local allAddons = AddonProfiles.AddonManager:GetAllAddons()
         for name, info in pairs(allAddons) do
-            if name ~= "AddonProfiles" and (not self.showOnlyCompatible or info.loadable) then
+            if name ~= "AddonProfiles" then
+                -- Only select visible addons (matching search)
                 if not self.searchText or self.searchText == "" or
                    name:lower():find(self.searchText:lower(), 1, true) or
                    info.title:lower():find(self.searchText:lower(), 1, true) then
@@ -77,7 +86,7 @@ function UI:PopulateAddonList()
             end
         end
         
-        self:PopulateAddonList()
+        self:RefreshAddonList()
         self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(selectAllBtn)
@@ -85,26 +94,60 @@ function UI:PopulateAddonList()
     local deselectAllBtn = AceGUI:Create("Button")
     deselectAllBtn:SetText("Deselect All")
     deselectAllBtn:SetWidth(190)
+    deselectAllBtn:SetDisabled(isReadOnly)
     deselectAllBtn:SetCallback("OnClick", function()
         if not profile then return end
         profile.addons = {}
-        self:PopulateAddonList()
+        self:RefreshAddonList()
         self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(deselectAllBtn)
     
     container:AddChild(btnGroup)
     
+    -- Store button group reference
+    self.addonListButtonGroup = btnGroup
+    
     -- Spacing
     local spacer = AceGUI:Create("Label")
     spacer:SetText(" ")
     spacer:SetFullWidth(true)
     container:AddChild(spacer)
+    self.addonListSpacer = spacer
     
-    -- Addon list (scrollable)
+    -- Initial addon list population
+    self:RefreshAddonList()
+    
+    self.MiddlePanel:AddChild(container)
+end
+
+function UI:RefreshAddonList()
+    if not self.addonListContainer then
+        return
+    end
+    
+    local profile = self.addonListProfile
+    local isReadOnly = self.addonListIsReadOnly
+    
+    if not profile then
+        return
+    end
+    
+    -- Remove existing scroll frame if present
+    if self.addonListScroll then
+        self.addonListContainer:ReleaseChildren()
+        
+        -- Re-add search box, buttons, and spacer
+        self.addonListContainer:AddChild(self.addonListSearchBox)
+        self.addonListContainer:AddChild(self.addonListButtonGroup)
+        self.addonListContainer:AddChild(self.addonListSpacer)
+    end
+    
+    -- Create new scroll frame
     local scroll = AceGUI:Create("ScrollFrame")
     scroll:SetFullWidth(true)
     scroll:SetLayout("List")
+    self.addonListScroll = scroll
     
     -- Get all addons
     local allAddons = AddonProfiles.AddonManager:GetAllAddons()
@@ -136,10 +179,8 @@ function UI:PopulateAddonList()
         
         -- Skip AddonProfiles itself
         if name ~= "AddonProfiles" then
-            -- Apply filters
+            -- Apply search filter
             local showAddon = true
-            
-            -- Search filter
             if self.searchText and self.searchText ~= "" then
                 local searchLower = self.searchText:lower()
                 if not (name:lower():find(searchLower, 1, true) or
@@ -191,7 +232,6 @@ function UI:PopulateAddonList()
         scroll:AddChild(noAddons)
     end
     
-    container:AddChild(scroll)
-    self.MiddlePanel:AddChild(container)
+    self.addonListContainer:AddChild(scroll)
 end
 

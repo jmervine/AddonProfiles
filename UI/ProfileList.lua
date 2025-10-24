@@ -108,7 +108,7 @@ function UI:PopulateProfileList()
     -- Account profiles
     if self.expandedCategories.account and #accountProfiles > 0 then
         for _, name in ipairs(accountProfiles) do
-            local isActive = (name == activeName and "account" == activeScope)
+            local isActive = (activeName == name and activeScope == "account")
             local isSelected = self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "account"
             local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "account", false)
             
@@ -184,7 +184,7 @@ function UI:PopulateProfileList()
         -- Character profiles
         if self.expandedCategories[charKey] then
             for _, name in ipairs(profileNames) do
-                local isActive = isCurrentChar and (name == activeName and "character" == activeScope)
+                local isActive = isCurrentChar and (activeName == name and activeScope == "character")
                 local isSelected = isCurrentChar and self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "character"
                 
                 -- Get addon count - for other characters, count directly from their data
