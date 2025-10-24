@@ -49,6 +49,7 @@ function UI:PopulateAddonList()
     searchBox:SetText(self.searchText or "")
     
     -- Always show Search button - user can clear text manually
+    searchBox:DisableButton(false)  -- Ensure button is enabled/visible
     searchBox.button:SetText("Search")
     
     -- Search button clicked
