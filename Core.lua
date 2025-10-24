@@ -74,27 +74,41 @@ function AddonProfiles:AddGameMenuButton()
         AddonProfiles:OpenUI()
     end)
     
-    -- Find the reference button to position relative to
-    local referenceButton = nil
-    if hideDefaultButton then
-        -- Hide the default AddOns button
-        if GameMenuButtonAddons then
-            GameMenuButtonAddons:Hide()
-        end
-        -- Try to find a button to position relative to (System, Options, or UIOptions)
-        referenceButton = GameMenuButtonOptions or GameMenuButtonUIOptions or GameMenuButtonHelp
-    else
+    if hideDefaultButton and GameMenuButtonAddons then
+        -- Hide the default AddOns button and take its place
+        GameMenuButtonAddons:Hide()
+        
+        -- Get AddOns button's position
+        local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
+        button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+        
+        self:Print("Addon Profiles button added (replacing AddOns)")
+    elseif GameMenuButtonAddons then
         -- Position below AddOns button
-        referenceButton = GameMenuButtonAddons
-    end
-    
-    if referenceButton then
-        button:SetPoint("TOP", referenceButton, "BOTTOM", 0, -1)
-        self:Print("Addon Profiles button added to game menu")
+        button:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -1)
+        
+        -- Find what was below AddOns and reposition it below our button
+        -- Common buttons: Macros, Logout, etc.
+        for _, btnName in ipairs({"GameMenuButtonMacros", "GameMenuButtonLogout", "GameMenuButtonQuit"}) do
+            local btn = _G[btnName]
+            if btn then
+                local point, relativeTo = btn:GetPoint()
+                if relativeTo == GameMenuButtonAddons then
+                    btn:ClearAllPoints()
+                    btn:SetPoint("TOP", button, "BOTTOM", 0, -1)
+                    break
+                end
+            end
+        end
+        
+        -- Adjust frame height
+        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight() + 1)
+        
+        self:Print("Addon Profiles button added (below AddOns)")
     else
-        -- Fallback: position at top of menu
+        -- No AddOns button found, position at top
         button:SetPoint("TOP", GameMenuFrame, "TOP", 0, -10)
-        self:Print("Addon Profiles button added (fallback position)")
+        self:Print("Addon Profiles button added (no AddOns button found)")
     end
     
     -- Ensure button is shown
