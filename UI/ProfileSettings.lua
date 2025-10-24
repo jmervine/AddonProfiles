@@ -330,97 +330,116 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
 end
 
 function UI:ConfirmDeleteProfile(profileName, profileScope)
-    -- Temporarily hide main frame so dialog appears on top
-    local wasShown = self.MainFrame and self.MainFrame:IsShown()
-    if wasShown then
-        self.MainFrame:Hide()
-    end
+    -- Create confirmation dialog using AceGUI (more reliable than StaticPopup)
+    local dialog = AceGUI:Create("Frame")
+    dialog:SetTitle("Confirm Delete")
+    dialog:SetLayout("Flow")
+    dialog:SetWidth(350)
+    dialog:SetHeight(150)
     
-    -- Capture UI reference for callbacks
-    local ui = self
+    -- Confirmation message
+    local message = AceGUI:Create("Label")
+    message:SetText(string.format("Delete profile '%s'?", profileName))
+    message:SetFullWidth(true)
+    dialog:AddChild(message)
     
-    -- Confirmation dialog
-    StaticPopupDialogs["ADDONPROFILES_DELETE_CONFIRM"] = {
-        text = string.format("Delete profile '%s'?", profileName),
-        button1 = "Delete",
-        button2 = "Cancel",
-        OnAccept = function()
-            local success, err = AddonProfiles.ProfileManager:DeleteProfile(profileName, profileScope)
-            if success then
-                AddonProfiles:Printf("Deleted profile '%s'.", profileName)
-                -- Clear selection and refresh
-                ui.currentProfile = nil
-                if wasShown then
-                    ui.MainFrame:Show()
-                    ui:Refresh()
-                end
-            else
-                AddonProfiles:Printf("Error: %s", err)
-                if wasShown then
-                    ui.MainFrame:Show()
-                end
-            end
-        end,
-        OnCancel = function()
-            if wasShown then
-                ui.MainFrame:Show()
-            end
-        end,
-        OnHide = function()
-            if wasShown and ui.MainFrame and not ui.MainFrame:IsShown() then
-                ui.MainFrame:Show()
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = STATICPOPUP_NUMDIALOGS
-    }
-    StaticPopup_Show("ADDONPROFILES_DELETE_CONFIRM")
+    -- Spacing
+    local spacer = AceGUI:Create("Label")
+    spacer:SetText(" ")
+    spacer:SetFullWidth(true)
+    dialog:AddChild(spacer)
+    
+    -- Buttons
+    local btnGroup = AceGUI:Create("SimpleGroup")
+    btnGroup:SetFullWidth(true)
+    btnGroup:SetLayout("Flow")
+    
+    local deleteBtn = AceGUI:Create("Button")
+    deleteBtn:SetText("Delete")
+    deleteBtn:SetWidth(150)
+    deleteBtn:SetCallback("OnClick", function()
+        local success, err = AddonProfiles.ProfileManager:DeleteProfile(profileName, profileScope)
+        if success then
+            AddonProfiles:Printf("Deleted profile '%s'.", profileName)
+            -- Clear selection and refresh
+            self.currentProfile = nil
+            self:Refresh()
+        else
+            AddonProfiles:Printf("Error: %s", err)
+        end
+        dialog:Release()
+    end)
+    btnGroup:AddChild(deleteBtn)
+    
+    local cancelBtn = AceGUI:Create("Button")
+    cancelBtn:SetText("Cancel")
+    cancelBtn:SetWidth(150)
+    cancelBtn:SetCallback("OnClick", function()
+        dialog:Release()
+    end)
+    btnGroup:AddChild(cancelBtn)
+    
+    dialog:AddChild(btnGroup)
+    
+    -- Cleanup
+    dialog:SetCallback("OnClose", function(widget)
+        AceGUI:Release(widget)
+    end)
 end
 
 function UI:ApplyProfile(profileName, profileScope)
-    -- Temporarily hide main frame so dialog appears on top
-    local wasShown = self.MainFrame and self.MainFrame:IsShown()
-    if wasShown then
-        self.MainFrame:Hide()
-    end
+    -- Create confirmation dialog using AceGUI (more reliable than StaticPopup)
+    local dialog = AceGUI:Create("Frame")
+    dialog:SetTitle("Confirm Apply")
+    dialog:SetLayout("Flow")
+    dialog:SetWidth(350)
+    dialog:SetHeight(180)
     
-    -- Capture UI reference for callbacks
-    local ui = self
+    -- Confirmation message
+    local message = AceGUI:Create("Label")
+    message:SetText(string.format("Apply profile '%s'?\n\nThis will reload the UI.", profileName))
+    message:SetFullWidth(true)
+    dialog:AddChild(message)
     
-    -- Confirmation dialog
-    StaticPopupDialogs["ADDONPROFILES_APPLY_CONFIRM"] = {
-        text = string.format("Apply profile '%s'?\n\nThis will reload the UI.", profileName),
-        button1 = "Apply",
-        button2 = "Cancel",
-        OnAccept = function()
-            local success, err = AddonProfiles.ProfileManager:ActivateProfile(profileName, profileScope)
-            if success then
-                -- Reload UI immediately (Classic doesn't have C_Timer)
-                ReloadUI()
-            else
-                AddonProfiles:Printf("Error: %s", err)
-                if wasShown then
-                    ui.MainFrame:Show()
-                end
-            end
-        end,
-        OnCancel = function()
-            if wasShown then
-                ui.MainFrame:Show()
-            end
-        end,
-        OnHide = function()
-            if wasShown and ui.MainFrame and not ui.MainFrame:IsShown() then
-                ui.MainFrame:Show()
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = STATICPOPUP_NUMDIALOGS
-    }
-    StaticPopup_Show("ADDONPROFILES_APPLY_CONFIRM")
+    -- Spacing
+    local spacer = AceGUI:Create("Label")
+    spacer:SetText(" ")
+    spacer:SetFullWidth(true)
+    dialog:AddChild(spacer)
+    
+    -- Buttons
+    local btnGroup = AceGUI:Create("SimpleGroup")
+    btnGroup:SetFullWidth(true)
+    btnGroup:SetLayout("Flow")
+    
+    local applyBtn = AceGUI:Create("Button")
+    applyBtn:SetText("Apply")
+    applyBtn:SetWidth(150)
+    applyBtn:SetCallback("OnClick", function()
+        local success, err = AddonProfiles.ProfileManager:ActivateProfile(profileName, profileScope)
+        if success then
+            -- Reload UI immediately (Classic doesn't have C_Timer)
+            ReloadUI()
+        else
+            AddonProfiles:Printf("Error: %s", err)
+            dialog:Release()
+        end
+    end)
+    btnGroup:AddChild(applyBtn)
+    
+    local cancelBtn = AceGUI:Create("Button")
+    cancelBtn:SetText("Cancel")
+    cancelBtn:SetWidth(150)
+    cancelBtn:SetCallback("OnClick", function()
+        dialog:Release()
+    end)
+    btnGroup:AddChild(cancelBtn)
+    
+    dialog:AddChild(btnGroup)
+    
+    -- Cleanup
+    dialog:SetCallback("OnClose", function(widget)
+        AceGUI:Release(widget)
+    end)
 end
 

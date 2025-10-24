@@ -67,6 +67,14 @@ function UI:CreateMainFrame()
     -- Add container to main frame
     frame:AddChild(container)
     
+    -- Select active profile by default if none is selected
+    if not self.currentProfile then
+        local activeName, activeScope = AddonProfiles.ProfileManager:GetActiveProfile()
+        if activeName and activeScope then
+            self.currentProfile = { name = activeName, scope = activeScope }
+        end
+    end
+    
     -- Populate panels (with error handling)
     local success, err = pcall(function()
         self:PopulateProfileList()
