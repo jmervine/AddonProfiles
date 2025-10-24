@@ -46,8 +46,13 @@ function UI:PopulateAddonList()
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel("Search")
     searchBox:SetFullWidth(true)
-    searchBox:SetText(self.searchText)
+    searchBox:SetText(self.searchText or "")
+    searchBox:DisableButton(true)  -- Remove OK button
     searchBox:SetCallback("OnTextChanged", function(widget, event, text)
+        self.searchText = text
+        self:PopulateAddonList()
+    end)
+    searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
         self.searchText = text
         self:PopulateAddonList()
     end)
