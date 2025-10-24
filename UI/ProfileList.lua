@@ -27,17 +27,6 @@ function UI:PopulateProfileList()
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetFullHeight(true)
-    container:SetLayout("List")
-    
-    -- General Settings button
-    local settingsButton = AceGUI:Create("Button")
-    settingsButton:SetText("General Settings")
-    settingsButton:SetFullWidth(true)
-    settingsButton:SetCallback("OnClick", function()
-        self.currentProfile = nil
-        self:Refresh()
-    end)
-    container:AddChild(settingsButton)
     
     -- New Profile button
     local newButton = AceGUI:Create("Button")
@@ -48,7 +37,7 @@ function UI:PopulateProfileList()
     end)
     container:AddChild(newButton)
     
-    -- Spacing
+    -- New Profile button
     local spacer1 = AceGUI:Create("Label")
     spacer1:SetText(" ")
     spacer1:SetFullWidth(true)
