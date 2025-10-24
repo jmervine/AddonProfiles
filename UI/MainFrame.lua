@@ -36,14 +36,11 @@ function UI:CreateMainFrame()
     wrapper:SetFullHeight(true)
     wrapper:SetLayout("List")
     
-    -- Create main container with three columns using relative widths that sum to 1.0
-    -- Fixed height to prevent panels from extending off screen
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetHeight(520)
     container:SetLayout("Flow")
     
-    -- All panels get same fixed height to align at top
     local panelHeight = 510
     
     -- Left panel (Profile List) - 28% relative width
@@ -80,11 +77,10 @@ function UI:CreateMainFrame()
     -- Add container to wrapper
     wrapper:AddChild(container)
     
-    -- Add General Settings section below the three panels (fixed height)
     local settingsGroup = AceGUI:Create("InlineGroup")
     settingsGroup:SetTitle("General Settings")
     settingsGroup:SetFullWidth(true)
-    settingsGroup:SetHeight(60)  -- Fixed small height for settings
+    settingsGroup:SetHeight(60)
     settingsGroup:SetLayout("Flow")
     
     -- Hide default AddOns button checkbox
