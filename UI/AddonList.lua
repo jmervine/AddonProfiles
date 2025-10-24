@@ -42,25 +42,17 @@ function UI:PopulateAddonList()
     -- Check if this is a read-only profile from another character
     local isReadOnly = self.currentProfile and self.currentProfile.readOnly
     
-    -- Search box
+    -- Search container with editbox and button side by side
+    local searchContainer = AceGUI:Create("SimpleGroup")
+    searchContainer:SetFullWidth(true)
+    searchContainer:SetLayout("Flow")
+    
+    -- Search text box
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel("Search")
-    searchBox:SetFullWidth(true)
+    searchBox:SetWidth(300)
     searchBox:SetText(self.searchText or "")
-    
-    -- Configure button before adding to container
-    searchBox:DisableButton(false)  -- Enable the button
-    searchBox.button:SetText("Search")
-    searchBox.button:SetWidth(80)  -- Set explicit width for button
-    
-    -- Search button clicked
-    searchBox.button:SetScript("OnClick", function()
-        local text = searchBox:GetText() or ""
-        -- Trim whitespace
-        text = text:match("^%s*(.-)%s*$") or ""
-        self.searchText = text
-        self:RefreshAddonList()  -- Only refresh scroll frame, not search box
-    end)
+    searchBox:DisableButton(true)  -- Disable built-in button, we'll use our own
     
     -- Enter key pressed
     searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
@@ -68,13 +60,25 @@ function UI:PopulateAddonList()
         -- Trim whitespace
         searchText = searchText:match("^%s*(.-)%s*$") or ""
         self.searchText = searchText
-        self:RefreshAddonList()  -- Only refresh scroll frame, not search box
+        self:RefreshAddonList()
     end)
     
-    container:AddChild(searchBox)
+    searchContainer:AddChild(searchBox)
     
-    -- Force button to show after adding to container
-    searchBox.button:Show()
+    -- Separate Search button that's always visible
+    local searchBtn = AceGUI:Create("Button")
+    searchBtn:SetText("Search")
+    searchBtn:SetWidth(80)
+    searchBtn:SetCallback("OnClick", function()
+        local text = searchBox:GetText() or ""
+        -- Trim whitespace
+        text = text:match("^%s*(.-)%s*$") or ""
+        self.searchText = text
+        self:RefreshAddonList()
+    end)
+    
+    searchContainer:AddChild(searchBtn)
+    container:AddChild(searchContainer)
     
     -- Store references for filtering
     self.addonListContainer = container
