@@ -37,31 +37,34 @@ function UI:CreateMainFrame()
     wrapper:SetLayout("List")
     
     -- Create main container with three columns using relative widths that sum to 1.0
-    -- Height calculated: frame(650) - titlebar/statusbar(~60) - settings(60) - padding(10) = 520
+    -- Fixed height to prevent panels from extending off screen
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetHeight(520)
     container:SetLayout("Flow")
     
+    -- All panels get same fixed height to align at top
+    local panelHeight = 510
+    
     -- Left panel (Profile List) - 28% relative width
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
     leftPanel:SetRelativeWidth(0.28)
-    leftPanel:SetFullHeight(true)
+    leftPanel:SetHeight(panelHeight)
     leftPanel:SetLayout("Fill")
     
     -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
     middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
-    middlePanel:SetFullHeight(true)
+    middlePanel:SetHeight(panelHeight)
     middlePanel:SetLayout("Fill")
     
     -- Right panel (Profile Settings) - 28% relative width (sums to 1.0)
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
     rightPanel:SetRelativeWidth(0.28)
-    rightPanel:SetFullHeight(true)
+    rightPanel:SetHeight(panelHeight)
     rightPanel:SetLayout("Fill")
     
     -- Store panel references
