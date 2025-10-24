@@ -58,6 +58,11 @@ end
 
 -- Add a button to the game menu (Escape menu)
 function AddonProfiles:AddGameMenuButton()
+    -- Check if button already exists
+    if GameMenuButtonAddonProfiles and GameMenuButtonAddonProfiles:IsShown() then
+        return
+    end
+    
     -- Check if we should hide the default AddOns button
     local hideDefaultButton = self.db.global.settings.hideDefaultAddonsButton
     
@@ -69,21 +74,31 @@ function AddonProfiles:AddGameMenuButton()
         AddonProfiles:OpenUI()
     end)
     
+    -- Find the reference button to position relative to
+    local referenceButton = nil
     if hideDefaultButton then
-        -- Hide the default AddOns button and position our button where it was
-        GameMenuButtonAddons:Hide()
-        button:SetPoint("TOP", "GameMenuButtonUIOptions", "BOTTOM", 0, -1)
-        
-        -- Adjust logout button
-        GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
+        -- Hide the default AddOns button
+        if GameMenuButtonAddons then
+            GameMenuButtonAddons:Hide()
+        end
+        -- Try to find a button to position relative to (System, Options, or UIOptions)
+        referenceButton = GameMenuButtonOptions or GameMenuButtonUIOptions or GameMenuButtonHelp
     else
-        -- Keep default AddOns button visible, position below it
-        button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
-        
-        -- Adjust logout button
-        GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
-        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight())
+        -- Position below AddOns button
+        referenceButton = GameMenuButtonAddons
     end
+    
+    if referenceButton then
+        button:SetPoint("TOP", referenceButton, "BOTTOM", 0, -1)
+        self:Print("Addon Profiles button added to game menu")
+    else
+        -- Fallback: position at top of menu
+        button:SetPoint("TOP", GameMenuFrame, "TOP", 0, -10)
+        self:Print("Addon Profiles button added (fallback position)")
+    end
+    
+    -- Ensure button is shown
+    button:Show()
 end
 
 -- Refresh the game menu button (called when settings change)
