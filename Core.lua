@@ -43,6 +43,27 @@ function AddonProfiles:OnEnable()
     if self.UI.Initialize then
         self.UI:Initialize()
     end
+    
+    -- Add button to game menu
+    self:AddGameMenuButton()
+end
+
+-- Add a button to the game menu (Escape menu)
+function AddonProfiles:AddGameMenuButton()
+    -- Create the button
+    local button = CreateFrame("Button", "GameMenuButtonAddonProfiles", GameMenuFrame, "GameMenuButtonTemplate")
+    button:SetText("Addon Profiles")
+    button:SetScript("OnClick", function()
+        HideUIPanel(GameMenuFrame)
+        AddonProfiles:OpenUI()
+    end)
+    
+    -- Position it below the Addons button
+    button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
+    
+    -- Adjust the rest of the menu
+    GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -16)
+    GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight())
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
