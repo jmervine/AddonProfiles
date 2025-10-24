@@ -48,9 +48,10 @@ function UI:PopulateAddonList()
     searchBox:SetFullWidth(true)
     searchBox:SetText(self.searchText or "")
     
-    -- Always show Search button - user can clear text manually
-    searchBox:DisableButton(false)  -- Ensure button is enabled/visible
+    -- Configure button before adding to container
+    searchBox:DisableButton(false)  -- Enable the button
     searchBox.button:SetText("Search")
+    searchBox.button:SetWidth(80)  -- Set explicit width for button
     
     -- Search button clicked
     searchBox.button:SetScript("OnClick", function()
@@ -71,6 +72,9 @@ function UI:PopulateAddonList()
     end)
     
     container:AddChild(searchBox)
+    
+    -- Force button to show after adding to container
+    searchBox.button:Show()
     
     -- Store references for filtering
     self.addonListContainer = container
