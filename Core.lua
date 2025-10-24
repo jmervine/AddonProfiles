@@ -4,13 +4,16 @@
 -- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.VERSION = "2.0.0-beta1"
+AddonProfiles.VERSION = "2.0.0-beta2"
 
 -- Database defaults
 local defaults = {
     global = {
         activeProfile = nil,
-        profiles = {}
+        profiles = {},
+        settings = {
+            hideDefaultAddonsButton = true  -- Hide WoW's default AddOns button by default
+        }
     },
     char = {
         activeProfile = nil,
@@ -43,6 +46,58 @@ function AddonProfiles:OnEnable()
     if self.UI.Initialize then
         self.UI:Initialize()
     end
+    
+    -- Hook GameMenuFrame to add our button when it's shown
+    GameMenuFrame:HookScript("OnShow", function()
+        if not self.gameMenuButtonAdded then
+            self:AddGameMenuButton()
+            self.gameMenuButtonAdded = true
+        end
+    end)
+end
+
+-- Add a button to the game menu (Escape menu)
+function AddonProfiles:AddGameMenuButton()
+    local hideDefaultButton = self.db.global.settings.hideDefaultAddonsButton
+    
+    if hideDefaultButton then
+        -- Replace AddOns button with Addon Profiles
+        if GameMenuButtonAddons then
+            GameMenuButtonAddons:Hide()
+        end
+        
+        if not GameMenuButtonAddonProfiles then
+            local button = CreateFrame("Button", "GameMenuButtonAddonProfiles", GameMenuFrame, "GameMenuButtonTemplate")
+            button:SetText("Addon Profiles")
+            button:SetScript("OnClick", function()
+                HideUIPanel(GameMenuFrame)
+                AddonProfiles:OpenUI()
+            end)
+            
+            if GameMenuButtonAddons then
+                local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
+                button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+            end
+        end
+        
+        if GameMenuButtonAddonProfiles then
+            GameMenuButtonAddonProfiles:Show()
+        end
+    else
+        -- Show AddOns button, hide Addon Profiles
+        if GameMenuButtonAddons then
+            GameMenuButtonAddons:Show()
+        end
+        
+        if GameMenuButtonAddonProfiles then
+            GameMenuButtonAddonProfiles:Hide()
+        end
+    end
+end
+
+-- Refresh the game menu button (called when settings change)
+function AddonProfiles:RefreshGameMenuButton()
+    self:AddGameMenuButton()
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
@@ -195,7 +250,7 @@ function AddonProfiles:ShowProfile(name)
     local depCount = self.AddonManager:GetDependencyCount(profile.addons, profile.autoDeps)
     
     self:Printf("Profile: %s (%s scope)", name, scope)
-    self:Printf("  Addons: %d", count)
+    self:Printf("  AddOns: %d", count)
     self:Printf("  Dependencies: %d", depCount)
     self:Printf("  Auto-include deps: %s", profile.autoDeps and "Yes" or "No")
     
@@ -207,7 +262,7 @@ function AddonProfiles:ShowProfile(name)
     table.sort(addonNames)
     
     if #addonNames > 0 then
-        self:Print("  Addons in profile:")
+        self:Print("  AddOns in profile:")
         for _, addonName in ipairs(addonNames) do
             self:Printf("    - %s", addonName)
         end
@@ -316,6 +371,6 @@ function AddonProfiles:OpenUI()
     
     if not success then
         self:Print("Error opening UI: " .. tostring(err))
-        self:Print("Please report this error with /bugreport")
+        self:Print("Please report this error at: https://github.com/jmervine/AddonProfiles/issues")
     end
 end

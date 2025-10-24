@@ -116,7 +116,7 @@ function UI:PopulateSettings()
     local depCount = AddonProfiles.AddonManager:GetDependencyCount(profile.addons, profile.autoDeps)
     
     local countLabel = AceGUI:Create("Label")
-    countLabel:SetText(string.format("Addons: %d\nDependencies: +%d\nTotal: %d", 
+    countLabel:SetText(string.format("AddOns: %d\nDependencies: +%d\nTotal: %d", 
         addonCount, depCount, addonCount + depCount))
     countLabel:SetFullWidth(true)
     countLabel:SetColor(0.7, 0.7, 0.7)
@@ -172,7 +172,7 @@ function UI:PopulateSettings()
     container:AddChild(spacer4)
     
     local captureBtn = AceGUI:Create("Button")
-    captureBtn:SetText("Select Active Addons")
+    captureBtn:SetText("Select Active AddOns")
     captureBtn:SetFullWidth(true)
     captureBtn:SetDisabled(isReadOnly)
     captureBtn:SetCallback("OnClick", function()
@@ -218,10 +218,9 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     -- Create dialog for copying profile
     local dialog = AceGUI:Create("Frame")
     dialog:SetTitle("Copy Profile")
-    dialog:SetStatusText("Create a copy of '" .. sourceProfileName .. "'")
     dialog:SetLayout("Flow")
     dialog:SetWidth(400)
-    dialog:SetHeight(280)
+    dialog:SetHeight(250)
     
     -- New profile name input
     local nameLabel = AceGUI:Create("Label")

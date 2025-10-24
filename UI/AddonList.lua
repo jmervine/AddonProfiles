@@ -42,17 +42,64 @@ function UI:PopulateAddonList()
     -- Check if this is a read-only profile from another character
     local isReadOnly = self.currentProfile and self.currentProfile.readOnly
     
-    -- Search box
+    -- Search container with editbox and button side by side
+    local searchContainer = AceGUI:Create("SimpleGroup")
+    searchContainer:SetFullWidth(true)
+    searchContainer:SetLayout("Flow")
+    
+    -- Search text box
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel("Search")
-    searchBox:SetFullWidth(true)
+    searchBox:SetWidth(300)
     searchBox:SetText(self.searchText or "")
-    searchBox.button:SetText("Search")
+    searchBox:DisableButton(true)  -- Disable built-in button, we'll use our own
+    
+    searchContainer:AddChild(searchBox)
+    
+    -- Separate Search/Clear button that's always visible
+    local searchBtn = AceGUI:Create("Button")
+    searchBtn:SetWidth(80)
+    
+    -- Function to update button state based on search text
+    local function updateSearchButton()
+        if self.searchText and self.searchText ~= "" then
+            -- Show Clear button when there's an active search
+            searchBtn:SetText("Clear")
+            searchBtn:SetCallback("OnClick", function()
+                self.searchText = ""
+                searchBox:SetText("")
+                self:RefreshAddonList()
+                updateSearchButton()  -- Switch back to Search after clearing
+            end)
+        else
+            -- Show Search button when search is empty
+            searchBtn:SetText("Search")
+            searchBtn:SetCallback("OnClick", function()
+                local text = searchBox:GetText() or ""
+                -- Trim whitespace
+                text = text:match("^%s*(.-)%s*$") or ""
+                self.searchText = text
+                self:RefreshAddonList()
+                updateSearchButton()  -- Update button after search
+            end)
+        end
+    end
+    
+    -- Enter key pressed
     searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
-        self.searchText = text
+        local searchText = widget:GetText() or text or ""
+        -- Trim whitespace
+        searchText = searchText:match("^%s*(.-)%s*$") or ""
+        self.searchText = searchText
         self:RefreshAddonList()
+        updateSearchButton()  -- Update button after Enter
     end)
-    container:AddChild(searchBox)
+    
+    -- Set initial button state
+    updateSearchButton()
+    
+    searchContainer:AddChild(searchBtn)
+    container:AddChild(searchContainer)
     
     -- Store references for filtering
     self.addonListContainer = container
@@ -87,7 +134,6 @@ function UI:PopulateAddonList()
         end
         
         self:RefreshAddonList()
-        self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(selectAllBtn)
     
@@ -97,9 +143,20 @@ function UI:PopulateAddonList()
     deselectAllBtn:SetDisabled(isReadOnly)
     deselectAllBtn:SetCallback("OnClick", function()
         if not profile then return end
-        profile.addons = {}
+        
+        local allAddons = AddonProfiles.AddonManager:GetAllAddons()
+        for name, info in pairs(allAddons) do
+            if name ~= "AddonProfiles" then
+                -- Only deselect visible addons (matching search)
+                if not self.searchText or self.searchText == "" or
+                   name:lower():find(self.searchText:lower(), 1, true) or
+                   info.title:lower():find(self.searchText:lower(), 1, true) then
+                    profile.addons[name] = nil
+                end
+            end
+        end
+        
         self:RefreshAddonList()
-        self:PopulateSettings() -- Update dep count
     end)
     btnGroup:AddChild(deselectAllBtn)
     
@@ -115,6 +172,13 @@ function UI:PopulateAddonList()
     container:AddChild(spacer)
     self.addonListSpacer = spacer
     
+    -- Create scroll frame
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetFullWidth(true)
+    scroll:SetLayout("List")
+    self.addonListScroll = scroll
+    container:AddChild(scroll)
+    
     -- Initial addon list population
     self:RefreshAddonList()
     
@@ -122,7 +186,7 @@ function UI:PopulateAddonList()
 end
 
 function UI:RefreshAddonList()
-    if not self.addonListContainer then
+    if not self.addonListScroll then
         return
     end
     
@@ -133,21 +197,10 @@ function UI:RefreshAddonList()
         return
     end
     
-    -- Remove existing scroll frame if present
-    if self.addonListScroll then
-        self.addonListContainer:ReleaseChildren()
-        
-        -- Re-add search box, buttons, and spacer
-        self.addonListContainer:AddChild(self.addonListSearchBox)
-        self.addonListContainer:AddChild(self.addonListButtonGroup)
-        self.addonListContainer:AddChild(self.addonListSpacer)
-    end
+    -- Clear only the scroll frame contents, not the whole container
+    self.addonListScroll:ReleaseChildren()
     
-    -- Create new scroll frame
-    local scroll = AceGUI:Create("ScrollFrame")
-    scroll:SetFullWidth(true)
-    scroll:SetLayout("List")
-    self.addonListScroll = scroll
+    local scroll = self.addonListScroll
     
     -- Get all addons
     local allAddons = AddonProfiles.AddonManager:GetAllAddons()
@@ -215,8 +268,7 @@ function UI:RefreshAddonList()
                 if not isReadOnly then
                     checkbox:SetCallback("OnValueChanged", function(widget, event, value)
                         profile.addons[name] = value or nil
-                        -- Only update settings panel, not entire addon list (prevents scroll jump)
-                        self:PopulateSettings() -- Update dep count
+                        -- Note: Settings panel will update when user saves or performs other actions
                     end)
                 end
                 
@@ -227,11 +279,9 @@ function UI:RefreshAddonList()
     
     if displayedCount == 0 then
         local noAddons = AceGUI:Create("Label")
-        noAddons:SetText("No addons match filter")
+        noAddons:SetText("No AddOns match filter")
         noAddons:SetFullWidth(true)
         scroll:AddChild(noAddons)
     end
-    
-    self.addonListContainer:AddChild(scroll)
 end
 

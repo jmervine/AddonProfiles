@@ -16,38 +16,49 @@ function UI:Initialize()
 end
 
 function UI:CreateMainFrame()
-    -- Create main window (make it resizable)
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
-    frame:SetStatusText("AddonProfiles v" .. AddonProfiles.VERSION)
+    frame:SetStatusText("v" .. AddonProfiles.VERSION)
     frame:SetLayout("Fill")
     frame:SetWidth(950)
     frame:SetHeight(650)
     
-    -- Store reference
     self.MainFrame = frame
     
-    -- Create main container with three columns using relative widths that sum to 1.0
+    local statusBar = frame.statustext:GetParent()
+    
+    local checkbox = CreateFrame("CheckButton", nil, statusBar, "UICheckButtonTemplate")
+    checkbox:SetPoint("RIGHT", statusBar, "RIGHT", -10, 0)
+    checkbox:SetSize(20, 20)
+    checkbox:SetChecked(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
+    checkbox:SetScript("OnClick", function(self)
+        local checked = self:GetChecked() == true
+        AddonProfiles.db.global.settings.hideDefaultAddonsButton = checked
+        self:SetChecked(checked)
+        AddonProfiles:RefreshGameMenuButton()
+    end)
+    
+    local checkLabel = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    checkLabel:SetPoint("RIGHT", checkbox, "LEFT", -5, 0)
+    checkLabel:SetText("Replace AddOns button")
+    
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
     container:SetFullHeight(true)
     container:SetLayout("Flow")
     
-    -- Left panel (Profile List) - 28% relative width
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
     leftPanel:SetRelativeWidth(0.28)
     leftPanel:SetFullHeight(true)
     leftPanel:SetLayout("Fill")
     
-    -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
-    middlePanel:SetTitle("Addons")
+    middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
     middlePanel:SetFullHeight(true)
     middlePanel:SetLayout("Fill")
     
-    -- Right panel (Profile Settings) - 28% relative width (sums to 1.0)
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
     rightPanel:SetRelativeWidth(0.28)
@@ -59,12 +70,10 @@ function UI:CreateMainFrame()
     self.MiddlePanel = middlePanel
     self.RightPanel = rightPanel
     
-    -- Add panels to container
     container:AddChild(leftPanel)
     container:AddChild(middlePanel)
     container:AddChild(rightPanel)
     
-    -- Add container to main frame
     frame:AddChild(container)
     
     -- Select active profile by default if none is selected
@@ -86,7 +95,6 @@ function UI:CreateMainFrame()
         AddonProfiles:Print("Error populating UI: " .. tostring(err))
     end
     
-    -- Force layout recalculation to fix initial sizing issue
     container:DoLayout()
     frame:DoLayout()
     
