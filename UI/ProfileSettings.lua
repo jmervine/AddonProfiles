@@ -27,10 +27,47 @@ function UI:PopulateSettings()
     local profileName, profileScope, profile = self:GetSelectedProfile()
     
     if not profile then
-        local noSelection = AceGUI:Create("Label")
-        noSelection:SetText("Select a profile to edit settings")
-        noSelection:SetFullWidth(true)
-        container:AddChild(noSelection)
+        -- Show general addon settings when no profile is selected
+        local header = AceGUI:Create("Label")
+        header:SetText("|cFFFFD700General Settings|r")
+        header:SetFullWidth(true)
+        header:SetFontObject(GameFontNormalLarge)
+        container:AddChild(header)
+        
+        local spacer1 = AceGUI:Create("Label")
+        spacer1:SetText(" ")
+        spacer1:SetFullWidth(true)
+        container:AddChild(spacer1)
+        
+        -- Hide default AddOns button setting
+        local hideDefaultCheckbox = AceGUI:Create("CheckBox")
+        hideDefaultCheckbox:SetLabel("Hide default AddOns menu button")
+        hideDefaultCheckbox:SetFullWidth(true)
+        hideDefaultCheckbox:SetValue(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
+        hideDefaultCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+            AddonProfiles.db.global.settings.hideDefaultAddonsButton = value
+            AddonProfiles:RefreshGameMenuButton()
+            AddonProfiles:Print(value and "Default AddOns button hidden" or "Default AddOns button visible")
+        end)
+        container:AddChild(hideDefaultCheckbox)
+        
+        local helpText = AceGUI:Create("Label")
+        helpText:SetText("When enabled, hides WoW's default AddOns button in the game menu (ESC) and positions Addon Profiles in its place.")
+        helpText:SetFullWidth(true)
+        helpText:SetColor(0.6, 0.6, 0.6)
+        container:AddChild(helpText)
+        
+        local spacer2 = AceGUI:Create("Label")
+        spacer2:SetText(" ")
+        spacer2:SetFullWidth(true)
+        container:AddChild(spacer2)
+        
+        local profilePrompt = AceGUI:Create("Label")
+        profilePrompt:SetText("\n\nSelect a profile to edit its settings")
+        profilePrompt:SetFullWidth(true)
+        profilePrompt:SetColor(0.7, 0.7, 0.7)
+        container:AddChild(profilePrompt)
+        
         self.RightPanel:AddChild(container)
         return
     end

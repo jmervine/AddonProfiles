@@ -10,7 +10,10 @@ AddonProfiles.VERSION = "2.0.0-beta2"
 local defaults = {
     global = {
         activeProfile = nil,
-        profiles = {}
+        profiles = {},
+        settings = {
+            hideDefaultAddonsButton = true  -- Hide WoW's default AddOns button by default
+        }
     },
     char = {
         activeProfile = nil,
@@ -50,7 +53,10 @@ end
 
 -- Add a button to the game menu (Escape menu)
 function AddonProfiles:AddGameMenuButton()
-    -- Create the button
+    -- Check if we should hide the default AddOns button
+    local hideDefaultButton = self.db.global.settings.hideDefaultAddonsButton
+    
+    -- Create the Addon Profiles button
     local button = CreateFrame("Button", "GameMenuButtonAddonProfiles", GameMenuFrame, "GameMenuButtonTemplate")
     button:SetText("Addon Profiles")
     button:SetScript("OnClick", function()
@@ -58,12 +64,38 @@ function AddonProfiles:AddGameMenuButton()
         AddonProfiles:OpenUI()
     end)
     
-    -- Position it below the AddOns button
-    button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
+    if hideDefaultButton then
+        -- Hide the default AddOns button and position our button where it was
+        GameMenuButtonAddons:Hide()
+        button:SetPoint("TOP", "GameMenuButtonUIOptions", "BOTTOM", 0, -1)
+        
+        -- Adjust logout button
+        GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
+    else
+        -- Keep default AddOns button visible, position below it
+        button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
+        
+        -- Adjust logout button
+        GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
+        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight())
+    end
+end
+
+-- Refresh the game menu button (called when settings change)
+function AddonProfiles:RefreshGameMenuButton()
+    -- Remove existing button
+    if GameMenuButtonAddonProfiles then
+        GameMenuButtonAddonProfiles:Hide()
+        GameMenuButtonAddonProfiles = nil
+    end
     
-    -- Adjust the rest of the menu with proper spacing
-    GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
-    GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight())
+    -- Restore default AddOns button visibility
+    if GameMenuButtonAddons then
+        GameMenuButtonAddons:Show()
+    end
+    
+    -- Re-add with current settings
+    self:AddGameMenuButton()
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
