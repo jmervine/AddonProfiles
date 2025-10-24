@@ -20,12 +20,18 @@ function UI:CreateMainFrame()
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
     frame:SetStatusText("AddonProfiles v" .. AddonProfiles.VERSION)
-    frame:SetLayout("List")  -- Changed from Fill to List to support multiple vertical children
+    frame:SetLayout("Fill")
     frame:SetWidth(950)
     frame:SetHeight(650)
     
     -- Store reference
     self.MainFrame = frame
+    
+    -- Create wrapper to hold both the panels and settings
+    local wrapper = AceGUI:Create("SimpleGroup")
+    wrapper:SetFullWidth(true)
+    wrapper:SetFullHeight(true)
+    wrapper:SetLayout("List")
     
     -- Create main container with three columns using relative widths that sum to 1.0
     local container = AceGUI:Create("SimpleGroup")
@@ -64,8 +70,8 @@ function UI:CreateMainFrame()
     container:AddChild(middlePanel)
     container:AddChild(rightPanel)
     
-    -- Add container to main frame
-    frame:AddChild(container)
+    -- Add container to wrapper
+    wrapper:AddChild(container)
     
     -- Add General Settings section below the three panels
     local settingsGroup = AceGUI:Create("InlineGroup")
@@ -84,7 +90,11 @@ function UI:CreateMainFrame()
     end)
     settingsGroup:AddChild(hideDefaultCheckbox)
     
-    frame:AddChild(settingsGroup)
+    -- Add settings to wrapper
+    wrapper:AddChild(settingsGroup)
+    
+    -- Add wrapper to frame
+    frame:AddChild(wrapper)
     
     -- Select active profile by default if none is selected
     if not self.currentProfile then
@@ -107,6 +117,7 @@ function UI:CreateMainFrame()
     
     -- Force layout recalculation to fix initial sizing issue
     container:DoLayout()
+    wrapper:DoLayout()
     frame:DoLayout()
     
     -- Hide by default
