@@ -47,15 +47,7 @@ function UI:PopulateAddonList()
     searchBox:SetLabel("Search")
     searchBox:SetFullWidth(true)
     searchBox:SetText(self.searchText or "")
-    searchBox:DisableButton(true)  -- Remove OK button
-    searchBox:SetCallback("OnTextChanged", function(widget, event, text)
-        self.searchText = text
-        self:RefreshAddonList()
-        -- Restore focus after refresh
-        if widget.editbox then
-            widget.editbox:SetFocus()
-        end
-    end)
+    searchBox.button:SetText("Search")
     searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
         self.searchText = text
         self:RefreshAddonList()
