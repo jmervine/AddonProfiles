@@ -316,6 +316,6 @@ function AddonProfiles:OpenUI()
     
     if not success then
         self:Print("Error opening UI: " .. tostring(err))
-        self:Print("Please report this error with /bugreport")
+        self:Print("Please report this error at: https://github.com/jmervine/AddonProfiles/issues")
     end
 end
