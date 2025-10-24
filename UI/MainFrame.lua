@@ -30,7 +30,7 @@ function UI:CreateMainFrame()
     -- Create main container with three columns using relative widths that sum to 1.0
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
-    container:SetFullHeight(true)
+    container:SetHeight(550)  -- Fixed height to leave room for General Settings below
     container:SetLayout("Flow")
     
     -- Left panel (Profile List) - 28% relative width
@@ -66,6 +66,25 @@ function UI:CreateMainFrame()
     
     -- Add container to main frame
     frame:AddChild(container)
+    
+    -- Add General Settings section below the three panels
+    local settingsGroup = AceGUI:Create("InlineGroup")
+    settingsGroup:SetTitle("General Settings")
+    settingsGroup:SetFullWidth(true)
+    settingsGroup:SetLayout("Flow")
+    
+    -- Hide default AddOns button checkbox
+    local hideDefaultCheckbox = AceGUI:Create("CheckBox")
+    hideDefaultCheckbox:SetLabel("Hide default AddOns menu button")
+    hideDefaultCheckbox:SetValue(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
+    hideDefaultCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        AddonProfiles.db.global.settings.hideDefaultAddonsButton = value
+        AddonProfiles:RefreshGameMenuButton()
+        AddonProfiles:Print(value and "Default AddOns button hidden" or "Default AddOns button visible")
+    end)
+    settingsGroup:AddChild(hideDefaultCheckbox)
+    
+    frame:AddChild(settingsGroup)
     
     -- Select active profile by default if none is selected
     if not self.currentProfile then

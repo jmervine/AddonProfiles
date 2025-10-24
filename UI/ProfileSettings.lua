@@ -31,10 +31,6 @@ function UI:PopulateSettings()
         noSelection:SetText("Select a profile to edit settings")
         noSelection:SetFullWidth(true)
         container:AddChild(noSelection)
-        
-        -- Add general settings at the bottom
-        self:AddGeneralSettingsSection(container)
-        
         self.RightPanel:AddChild(container)
         return
     end
@@ -214,9 +210,6 @@ function UI:PopulateSettings()
         self:ConfirmDeleteProfile(profileName, profileScope)
     end)
     container:AddChild(deleteBtn)
-    
-    -- Add general settings at the bottom
-    self:AddGeneralSettingsSection(container)
     
     self.RightPanel:AddChild(container)
 end
