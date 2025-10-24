@@ -93,6 +93,10 @@ function UI:CreateMainFrame()
     -- Hide by default
     frame:Hide()
     
+    -- Enable Escape key to close window
+    -- Add to UISpecialFrames so Escape key closes it
+    table.insert(UISpecialFrames, frame.frame:GetName())
+    
     -- Callback when frame is closed
     frame:SetCallback("OnClose", function(widget)
         AceGUI:Release(widget)
