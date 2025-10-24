@@ -138,10 +138,21 @@ function UI:GetSelectedProfile()
         return nil
     end
     
-    local profile = AddonProfiles.ProfileManager:GetProfile(
-        self.currentProfile.name,
-        self.currentProfile.scope
-    )
+    local profile
+    
+    -- Check if this is a profile from another character
+    if self.currentProfile.charKey and self.currentProfile.scope == "character" then
+        -- Fetch from other character's database
+        if AddonProfiles.db.sv.char and AddonProfiles.db.sv.char[self.currentProfile.charKey] then
+            profile = AddonProfiles.db.sv.char[self.currentProfile.charKey].profiles[self.currentProfile.name]
+        end
+    else
+        -- Fetch from current character using ProfileManager
+        profile = AddonProfiles.ProfileManager:GetProfile(
+            self.currentProfile.name,
+            self.currentProfile.scope
+        )
+    end
     
     if profile then
         return self.currentProfile.name, self.currentProfile.scope, profile

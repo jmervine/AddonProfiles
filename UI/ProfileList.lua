@@ -186,7 +186,20 @@ function UI:PopulateProfileList()
             for _, name in ipairs(profileNames) do
                 local isActive = isCurrentChar and (name == activeName and "character" == activeScope)
                 local isSelected = isCurrentChar and self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "character"
-                local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "character", false)
+                
+                -- Get addon count - for other characters, count directly from their data
+                local addonCount = 0
+                if isCurrentChar then
+                    addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "character", false)
+                else
+                    -- Count addons directly from other character's profile
+                    local otherProfile = AddonProfiles.db.sv.char[charKey].profiles[name]
+                    if otherProfile and otherProfile.addons then
+                        for _ in pairs(otherProfile.addons) do
+                            addonCount = addonCount + 1
+                        end
+                    end
+                end
                 
                 local profileBtn = AceGUI:Create("InteractiveLabel")
                 local text = "  " .. name .. " (" .. addonCount .. ")"
