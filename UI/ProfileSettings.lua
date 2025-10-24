@@ -35,6 +35,22 @@ function UI:PopulateSettings()
         return
     end
     
+    -- Check if this is a read-only profile from another character
+    local isReadOnly = self.currentProfile and self.currentProfile.readOnly
+    
+    if isReadOnly then
+        local readOnlyNotice = AceGUI:Create("Label")
+        readOnlyNotice:SetText("|cFFFF6600View Only Profile (from another character)|r")
+        readOnlyNotice:SetFullWidth(true)
+        readOnlyNotice:SetColor(1, 0.4, 0)  -- Orange
+        container:AddChild(readOnlyNotice)
+        
+        local spacer0 = AceGUI:Create("Label")
+        spacer0:SetText(" ")
+        spacer0:SetFullWidth(true)
+        container:AddChild(spacer0)
+    end
+    
     -- Profile name
     local nameLabel = AceGUI:Create("Label")
     nameLabel:SetText("Profile Name:")
@@ -44,6 +60,7 @@ function UI:PopulateSettings()
     local nameBox = AceGUI:Create("EditBox")
     nameBox:SetFullWidth(true)
     nameBox:SetText(profileName)
+    nameBox:SetDisabled(isReadOnly)
     nameBox:SetCallback("OnEnterPressed", function(widget, event, text)
         if text and text ~= "" and text ~= profileName then
             local success, err = AddonProfiles.ProfileManager:RenameProfile(profileName, text, profileScope)
@@ -128,10 +145,11 @@ function UI:PopulateSettings()
     spacer3b:SetFullWidth(true)
     container:AddChild(spacer3b)
     
-    -- Action buttons
+    -- Action buttons (disabled for read-only profiles)
     local applyBtn = AceGUI:Create("Button")
     applyBtn:SetText("Apply Profile")
     applyBtn:SetFullWidth(true)
+    applyBtn:SetDisabled(isReadOnly)
     applyBtn:SetCallback("OnClick", function()
         self:ApplyProfile(profileName, profileScope)
     end)
@@ -141,7 +159,7 @@ function UI:PopulateSettings()
     local activeName, activeScope = AddonProfiles.ProfileManager:GetActiveProfile()
     if profileName == activeName and profileScope == activeScope then
         local activeLabel = AceGUI:Create("Label")
-        activeLabel:SetText("✓ Currently Active")
+        activeLabel:SetText("Currently Active")
         activeLabel:SetFullWidth(true)
         activeLabel:SetColor(0, 1, 0)
         container:AddChild(activeLabel)
@@ -156,6 +174,7 @@ function UI:PopulateSettings()
     local captureBtn = AceGUI:Create("Button")
     captureBtn:SetText("Select Active Addons")
     captureBtn:SetFullWidth(true)
+    captureBtn:SetDisabled(isReadOnly)
     captureBtn:SetCallback("OnClick", function()
         local success, err = AddonProfiles.ProfileManager:SaveCurrentState(profileName, profileScope)
         if success then
@@ -173,7 +192,7 @@ function UI:PopulateSettings()
     spacer5:SetFullWidth(true)
     container:AddChild(spacer5)
     
-    -- Copy Profile button
+    -- Copy Profile button (always enabled - can copy from other characters)
     local copyBtn = AceGUI:Create("Button")
     copyBtn:SetText("Copy Profile")
     copyBtn:SetFullWidth(true)
@@ -182,10 +201,11 @@ function UI:PopulateSettings()
     end)
     container:AddChild(copyBtn)
     
-    -- Delete Profile button
+    -- Delete Profile button (disabled for read-only profiles)
     local deleteBtn = AceGUI:Create("Button")
     deleteBtn:SetText("Delete Profile")
     deleteBtn:SetFullWidth(true)
+    deleteBtn:SetDisabled(isReadOnly)
     deleteBtn:SetCallback("OnClick", function()
         self:ConfirmDeleteProfile(profileName, profileScope)
     end)

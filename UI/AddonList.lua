@@ -39,6 +39,9 @@ function UI:PopulateAddonList()
         return
     end
     
+    -- Check if this is a read-only profile from another character
+    local isReadOnly = self.currentProfile and self.currentProfile.readOnly
+    
     -- Search box
     local searchBox = AceGUI:Create("EditBox")
     searchBox:SetLabel("Search")
@@ -160,17 +163,21 @@ function UI:PopulateAddonList()
                 checkbox:SetFullWidth(true)
                 checkbox:SetValue(profile.addons[name] == true)
                 
-                -- Disable if required by another addon's dependencies
-                if requiredByDeps[name] and not profile.addons[name] then
+                -- Disable if read-only or required by another addon's dependencies
+                if isReadOnly then
+                    checkbox:SetDisabled(true)
+                elseif requiredByDeps[name] and not profile.addons[name] then
                     checkbox:SetDisabled(true)
                     checkbox:SetValue(true) -- Show as checked but disabled
                 end
                 
-                checkbox:SetCallback("OnValueChanged", function(widget, event, value)
-                    profile.addons[name] = value or nil
-                    -- Only update settings panel, not entire addon list (prevents scroll jump)
-                    self:PopulateSettings() -- Update dep count
-                end)
+                if not isReadOnly then
+                    checkbox:SetCallback("OnValueChanged", function(widget, event, value)
+                        profile.addons[name] = value or nil
+                        -- Only update settings panel, not entire addon list (prevents scroll jump)
+                        self:PopulateSettings() -- Update dep count
+                    end)
+                end
                 
                 scroll:AddChild(checkbox)
             end

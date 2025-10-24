@@ -55,18 +55,31 @@ function UI:PopulateProfileList()
     
     -- Organize profiles by scope
     local accountProfiles = {}
-    local charProfiles = {}
     
     for name, profile in pairs(profiles) do
         if profile.scope == "account" then
             table.insert(accountProfiles, name)
-        else
-            table.insert(charProfiles, name)
         end
     end
     
     table.sort(accountProfiles)
-    table.sort(charProfiles)
+    
+    -- Get all character profiles from all characters in the database
+    local charProfilesByCharacter = {}
+    local currentCharKey = UnitName("player") .. " - " .. GetRealmName()
+    
+    -- Iterate through all realm/character combinations in the database
+    if AddonProfiles.db.sv.char then
+        for realmCharKey, charData in pairs(AddonProfiles.db.sv.char) do
+            if charData.profiles and next(charData.profiles) then
+                charProfilesByCharacter[realmCharKey] = {}
+                for profileName, profileData in pairs(charData.profiles) do
+                    table.insert(charProfilesByCharacter[realmCharKey], profileName)
+                end
+                table.sort(charProfilesByCharacter[realmCharKey])
+            end
+        end
+    end
     
     -- Initialize expanded state
     if self.expandedCategories == nil then
@@ -132,48 +145,80 @@ function UI:PopulateProfileList()
     spacer2:SetFullWidth(true)
     scroll:AddChild(spacer2)
     
-    -- Character-specific category
-    if #charProfiles > 0 then
-        local charName = UnitName("player")
+    -- Character-specific profiles (all characters)
+    -- Sort character keys so current character appears first
+    local charKeys = {}
+    for charKey in pairs(charProfilesByCharacter) do
+        table.insert(charKeys, charKey)
+    end
+    table.sort(charKeys, function(a, b)
+        if a == currentCharKey then return true end
+        if b == currentCharKey then return false end
+        return a < b
+    end)
+    
+    for _, charKey in ipairs(charKeys) do
+        local profileNames = charProfilesByCharacter[charKey]
+        local isCurrentChar = (charKey == currentCharKey)
+        
+        -- Initialize expanded state for this character
+        if self.expandedCategories[charKey] == nil then
+            self.expandedCategories[charKey] = isCurrentChar  -- Current char expanded by default
+        end
+        
         local charHeader = AceGUI:Create("InteractiveLabel")
-        charHeader:SetText((self.expandedCategories.character and "[-] " or "[+] ") .. charName)
+        charHeader:SetText((self.expandedCategories[charKey] and "[-] " or "[+] ") .. charKey)
         charHeader:SetFullWidth(true)
         charHeader:SetCallback("OnClick", function()
-            self.expandedCategories.character = not self.expandedCategories.character
+            self.expandedCategories[charKey] = not self.expandedCategories[charKey]
             self:PopulateProfileList()
         end)
         scroll:AddChild(charHeader)
         
         -- Spacing after header
-        local headerSpacer2 = AceGUI:Create("Label")
-        headerSpacer2:SetText(" ")
-        headerSpacer2:SetFullWidth(true)
-        scroll:AddChild(headerSpacer2)
+        local headerSpacer = AceGUI:Create("Label")
+        headerSpacer:SetText(" ")
+        headerSpacer:SetFullWidth(true)
+        scroll:AddChild(headerSpacer)
         
         -- Character profiles
-        if self.expandedCategories.character then
-            for _, name in ipairs(charProfiles) do
-                local isActive = (name == activeName and "character" == activeScope)
-                local isSelected = self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "character"
+        if self.expandedCategories[charKey] then
+            for _, name in ipairs(profileNames) do
+                local isActive = isCurrentChar and (name == activeName and "character" == activeScope)
+                local isSelected = isCurrentChar and self.currentProfile and self.currentProfile.name == name and self.currentProfile.scope == "character"
                 local addonCount = AddonProfiles.ProfileManager:GetProfileAddonCount(name, "character", false)
                 
                 local profileBtn = AceGUI:Create("InteractiveLabel")
                 local text = "  " .. name .. " (" .. addonCount .. ")"
-                if isActive then
-                    text = "  ✓ " .. name .. " (" .. addonCount .. ")"
+                if not isCurrentChar then
+                    text = text .. " (view only)"
                 end
                 profileBtn:SetText(text)
                 profileBtn:SetFullWidth(true)
                 
                 if isSelected then
-                    profileBtn:SetColor(1, 0.82, 0)  -- Gold highlight
+                    profileBtn:SetColor(1, 0.82, 0)  -- Gold = Selected for editing
+                elseif isActive then
+                    profileBtn:SetColor(0, 1, 0)  -- Green = Active/Applied
+                elseif not isCurrentChar then
+                    profileBtn:SetColor(0.6, 0.6, 0.6)  -- Gray = From another character
                 else
-                    profileBtn:SetColor(1, 1, 1)  -- White
+                    profileBtn:SetColor(1, 1, 1)  -- White = Normal
                 end
                 
-                profileBtn:SetCallback("OnClick", function()
-                    self:SelectProfile(name, "character")
-                end)
+                if isCurrentChar then
+                    profileBtn:SetCallback("OnClick", function()
+                        self:SelectProfile(name, "character")
+                    end)
+                else
+                    -- Other character's profile - show in settings but can't activate
+                    profileBtn:SetCallback("OnClick", function()
+                        AddonProfiles:Print("This profile belongs to another character. You can copy it but not activate it directly.")
+                        -- Still select it so it can be viewed/copied
+                        self.currentProfile = { name = name, scope = "character", readOnly = true, charKey = charKey }
+                        self:Refresh()
+                    end)
+                end
                 
                 scroll:AddChild(profileBtn)
                 
@@ -184,6 +229,12 @@ function UI:PopulateProfileList()
                 scroll:AddChild(profileSpacer)
             end
         end
+        
+        -- Spacing between characters
+        local charSpacer = AceGUI:Create("Label")
+        charSpacer:SetText(" ")
+        charSpacer:SetFullWidth(true)
+        scroll:AddChild(charSpacer)
     end
     
     container:AddChild(scroll)
