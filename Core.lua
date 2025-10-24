@@ -47,8 +47,13 @@ function AddonProfiles:OnEnable()
         self.UI:Initialize()
     end
     
-    -- Add button to game menu
-    self:AddGameMenuButton()
+    -- Hook GameMenuFrame to add our button when it's shown
+    GameMenuFrame:HookScript("OnShow", function()
+        if not self.gameMenuButtonAdded then
+            self:AddGameMenuButton()
+            self.gameMenuButtonAdded = true
+        end
+    end)
 end
 
 -- Add a button to the game menu (Escape menu)
@@ -94,8 +99,10 @@ function AddonProfiles:RefreshGameMenuButton()
         GameMenuButtonAddons:Show()
     end
     
-    -- Re-add with current settings
+    -- Reset flag and re-add button
+    self.gameMenuButtonAdded = false
     self:AddGameMenuButton()
+    self.gameMenuButtonAdded = true
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
