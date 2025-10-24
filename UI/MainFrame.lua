@@ -25,11 +25,11 @@ function UI:CreateMainFrame()
     self.MainFrame = frame
     
     local statusText = frame.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    statusText:SetPoint("BOTTOMLEFT", 10, 10)
+    statusText:SetPoint("BOTTOMLEFT", 15, 30)
     statusText:SetText("v" .. AddonProfiles.VERSION)
     
     local checkbox = CreateFrame("CheckButton", nil, frame.frame, "UICheckButtonTemplate")
-    checkbox:SetPoint("BOTTOMLEFT", 200, 8)
+    checkbox:SetPoint("BOTTOMLEFT", 200, 28)
     checkbox:SetSize(24, 24)
     checkbox:SetChecked(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
     checkbox:SetScript("OnClick", function(self)
