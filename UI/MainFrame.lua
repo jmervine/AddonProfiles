@@ -32,14 +32,15 @@ function UI:CreateMainFrame()
     checkbox:SetSize(20, 20)
     checkbox:SetChecked(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
     checkbox:SetScript("OnClick", function(self)
-        local checked = self:GetChecked()
+        local checked = self:GetChecked() == true
         AddonProfiles.db.global.settings.hideDefaultAddonsButton = checked
+        self:SetChecked(checked)
         AddonProfiles:RefreshGameMenuButton()
     end)
     
     local checkLabel = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     checkLabel:SetPoint("RIGHT", checkbox, "LEFT", -5, 0)
-    checkLabel:SetText("Hide default AddOns button")
+    checkLabel:SetText("Replace AddOns button")
     
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)

@@ -58,92 +58,46 @@ end
 
 -- Add a button to the game menu (Escape menu)
 function AddonProfiles:AddGameMenuButton()
-    -- Check if button already exists
-    if GameMenuButtonAddonProfiles and GameMenuButtonAddonProfiles:IsShown() then
-        return
-    end
-    
-    -- Check if we should hide the default AddOns button
     local hideDefaultButton = self.db.global.settings.hideDefaultAddonsButton
     
-    -- Create the Addon Profiles button
-    local button = CreateFrame("Button", "GameMenuButtonAddonProfiles", GameMenuFrame, "GameMenuButtonTemplate")
-    button:SetText("Addon Profiles")
-    button:SetScript("OnClick", function()
-        HideUIPanel(GameMenuFrame)
-        AddonProfiles:OpenUI()
-    end)
-    
-    if hideDefaultButton and GameMenuButtonAddons then
-        -- Hide the default AddOns button and take its place
-        GameMenuButtonAddons:Hide()
+    if hideDefaultButton then
+        -- Replace AddOns button with Addon Profiles
+        if GameMenuButtonAddons then
+            GameMenuButtonAddons:Hide()
+        end
         
-        -- Get AddOns button's position
-        local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
-        button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
-        
-        -- Find what was below AddOns and reposition with normal spacing
-        for _, btnName in ipairs({"GameMenuButtonMacros", "GameMenuButtonLogout", "GameMenuButtonQuit"}) do
-            local btn = _G[btnName]
-            if btn then
-                local pt, rel = btn:GetPoint()
-                if rel == GameMenuButtonAddons then
-                    btn:ClearAllPoints()
-                    btn:SetPoint("TOP", button, "BOTTOM", 0, -1)
-                    break
-                end
+        if not GameMenuButtonAddonProfiles then
+            local button = CreateFrame("Button", "GameMenuButtonAddonProfiles", GameMenuFrame, "GameMenuButtonTemplate")
+            button:SetText("Addon Profiles")
+            button:SetScript("OnClick", function()
+                HideUIPanel(GameMenuFrame)
+                AddonProfiles:OpenUI()
+            end)
+            
+            if GameMenuButtonAddons then
+                local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
+                button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
             end
         end
         
-        self:Print("Addon Profiles button added (replacing AddOns)")
-    elseif GameMenuButtonAddons then
-        -- Position below AddOns button with more spacing
-        button:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -1)
-        
-        -- Find what was below AddOns and reposition it below our button with proper spacing
-        for _, btnName in ipairs({"GameMenuButtonMacros", "GameMenuButtonLogout", "GameMenuButtonQuit"}) do
-            local btn = _G[btnName]
-            if btn then
-                local point, relativeTo = btn:GetPoint()
-                if relativeTo == GameMenuButtonAddons then
-                    btn:ClearAllPoints()
-                    btn:SetPoint("TOP", button, "BOTTOM", 0, -16)
-                    break
-                end
-            end
+        if GameMenuButtonAddonProfiles then
+            GameMenuButtonAddonProfiles:Show()
         end
-        
-        -- Adjust frame height
-        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight() + 16)
-        
-        self:Print("Addon Profiles button added (below AddOns)")
     else
-        -- No AddOns button found, position at top
-        button:SetPoint("TOP", GameMenuFrame, "TOP", 0, -10)
-        self:Print("Addon Profiles button added (no AddOns button found)")
+        -- Show AddOns button, hide Addon Profiles
+        if GameMenuButtonAddons then
+            GameMenuButtonAddons:Show()
+        end
+        
+        if GameMenuButtonAddonProfiles then
+            GameMenuButtonAddonProfiles:Hide()
+        end
     end
-    
-    -- Ensure button is shown
-    button:Show()
 end
 
 -- Refresh the game menu button (called when settings change)
 function AddonProfiles:RefreshGameMenuButton()
-    -- Remove existing button
-    if GameMenuButtonAddonProfiles then
-        GameMenuButtonAddonProfiles:Hide()
-        GameMenuButtonAddonProfiles = nil
-    end
-    
-    -- Restore default AddOns button visibility
-    if GameMenuButtonAddons then
-        GameMenuButtonAddons:Show()
-    end
-    
-    -- Reset flag and re-add button
-    self.gameMenuButtonAdded = false
     self:AddGameMenuButton()
-    self.gameMenuButtonAdded = true
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
