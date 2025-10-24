@@ -1,7 +1,7 @@
 ## Title: AddonProfiles
 ## Notes: Save and load Addon enabled/disabled profiles with UI management and dependency handling.
 ## Author: Hound @ Atiesh (WotLK)
-## Version: 2.0.0-beta1
+## Version: 2.0.0-beta2
 ## SavedVariables: AddonProfilesDB, AddonProfilesStore
 ## OptionalDeps: Ace3
 ## Interface: 11508
