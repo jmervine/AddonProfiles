@@ -82,18 +82,12 @@ function AddonProfiles:AddGameMenuButton()
         local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
         button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
         
-        self:Print("Addon Profiles button added (replacing AddOns)")
-    elseif GameMenuButtonAddons then
-        -- Position below AddOns button
-        button:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -1)
-        
-        -- Find what was below AddOns and reposition it below our button
-        -- Common buttons: Macros, Logout, etc.
+        -- Find what was below AddOns and reposition with normal spacing
         for _, btnName in ipairs({"GameMenuButtonMacros", "GameMenuButtonLogout", "GameMenuButtonQuit"}) do
             local btn = _G[btnName]
             if btn then
-                local point, relativeTo = btn:GetPoint()
-                if relativeTo == GameMenuButtonAddons then
+                local pt, rel = btn:GetPoint()
+                if rel == GameMenuButtonAddons then
                     btn:ClearAllPoints()
                     btn:SetPoint("TOP", button, "BOTTOM", 0, -1)
                     break
@@ -101,8 +95,26 @@ function AddonProfiles:AddGameMenuButton()
             end
         end
         
+        self:Print("Addon Profiles button added (replacing AddOns)")
+    elseif GameMenuButtonAddons then
+        -- Position below AddOns button with more spacing
+        button:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -1)
+        
+        -- Find what was below AddOns and reposition it below our button with proper spacing
+        for _, btnName in ipairs({"GameMenuButtonMacros", "GameMenuButtonLogout", "GameMenuButtonQuit"}) do
+            local btn = _G[btnName]
+            if btn then
+                local point, relativeTo = btn:GetPoint()
+                if relativeTo == GameMenuButtonAddons then
+                    btn:ClearAllPoints()
+                    btn:SetPoint("TOP", button, "BOTTOM", 0, -16)
+                    break
+                end
+            end
+        end
+        
         -- Adjust frame height
-        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight() + 1)
+        GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight() + 16)
         
         self:Print("Addon Profiles button added (below AddOns)")
     else
