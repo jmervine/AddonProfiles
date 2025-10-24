@@ -94,8 +94,24 @@ function UI:CreateMainFrame()
     frame:Hide()
     
     -- Enable Escape key to close window
-    -- Add to UISpecialFrames so Escape key closes it
-    table.insert(UISpecialFrames, frame.frame:GetName())
+    -- Set up proper frame name and register with UISpecialFrames
+    if not frame.frame:GetName() then
+        frame.frame:SetName("AddonProfilesMainFrame")
+    end
+    
+    -- Make frame respond to Escape key
+    frame.frame:SetPropagateKeyboardInput(true)
+    frame.frame:SetScript("OnKeyDown", function(self, key)
+        if key == "ESCAPE" then
+            self:SetPropagateKeyboardInput(false)
+            frame:Hide()
+        else
+            self:SetPropagateKeyboardInput(true)
+        end
+    end)
+    
+    -- Also add to UISpecialFrames as backup
+    tinsert(UISpecialFrames, "AddonProfilesMainFrame")
     
     -- Callback when frame is closed
     frame:SetCallback("OnClose", function(widget)
