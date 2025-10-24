@@ -218,10 +218,9 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     -- Create dialog for copying profile
     local dialog = AceGUI:Create("Frame")
     dialog:SetTitle("Copy Profile")
-    dialog:SetStatusText("Create a copy of '" .. sourceProfileName .. "'")
     dialog:SetLayout("Flow")
     dialog:SetWidth(400)
-    dialog:SetHeight(280)
+    dialog:SetHeight(250)
     
     -- New profile name input
     local nameLabel = AceGUI:Create("Label")
@@ -268,7 +267,7 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     
     local createBtn = AceGUI:Create("Button")
     createBtn:SetText("Copy")
-    createBtn:SetFullWidth(true)
+    createBtn:SetWidth(150)
     createBtn:SetCallback("OnClick", function()
         local newName = nameInput:GetText()
         local newScope = scopeDropdown:GetValue()
@@ -322,6 +321,14 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
         dialog:Release()
     end)
     btnGroup:AddChild(createBtn)
+    
+    local cancelBtn = AceGUI:Create("Button")
+    cancelBtn:SetText("Cancel")
+    cancelBtn:SetWidth(150)
+    cancelBtn:SetCallback("OnClick", function()
+        dialog:Release()
+    end)
+    btnGroup:AddChild(cancelBtn)
     
     dialog:AddChild(btnGroup)
     
