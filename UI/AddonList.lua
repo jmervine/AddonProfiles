@@ -47,11 +47,28 @@ function UI:PopulateAddonList()
     searchBox:SetLabel("Search")
     searchBox:SetFullWidth(true)
     searchBox:SetText(self.searchText or "")
+    
+    -- Always show Search button - user can clear text manually
     searchBox.button:SetText("Search")
-    searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
+    
+    -- Search button clicked
+    searchBox.button:SetScript("OnClick", function()
+        local text = searchBox:GetText() or ""
+        -- Trim whitespace
+        text = text:match("^%s*(.-)%s*$") or ""
         self.searchText = text
-        self:RefreshAddonList()
+        self:PopulateAddonList()
     end)
+    
+    -- Enter key pressed
+    searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
+        local searchText = widget:GetText() or text or ""
+        -- Trim whitespace
+        searchText = searchText:match("^%s*(.-)%s*$") or ""
+        self.searchText = searchText
+        self:PopulateAddonList()
+    end)
+    
     container:AddChild(searchBox)
     
     -- Store references for filtering
