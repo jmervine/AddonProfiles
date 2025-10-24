@@ -24,6 +24,9 @@ function UI:CreateMainFrame()
     frame:SetWidth(950)
     frame:SetHeight(650)
     
+    -- Store frame reference for resize handling
+    self.MainFrameWidget = frame
+    
     -- Store reference
     self.MainFrame = frame
     
@@ -34,30 +37,31 @@ function UI:CreateMainFrame()
     wrapper:SetLayout("List")
     
     -- Create main container with three columns using relative widths that sum to 1.0
+    -- Height calculated: frame(650) - titlebar/statusbar(~60) - settings(60) - padding(10) = 520
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
-    container:SetHeight(550)  -- Fixed height to leave room for General Settings below
+    container:SetHeight(520)
     container:SetLayout("Flow")
     
     -- Left panel (Profile List) - 28% relative width
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
     leftPanel:SetRelativeWidth(0.28)
-    leftPanel:SetHeight(540)  -- Fixed height to match container
+    leftPanel:SetFullHeight(true)
     leftPanel:SetLayout("Fill")
     
     -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
     middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
-    middlePanel:SetHeight(540)  -- Fixed height to match container
+    middlePanel:SetFullHeight(true)
     middlePanel:SetLayout("Fill")
     
     -- Right panel (Profile Settings) - 28% relative width (sums to 1.0)
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
     rightPanel:SetRelativeWidth(0.28)
-    rightPanel:SetHeight(540)  -- Fixed height to match container
+    rightPanel:SetFullHeight(true)
     rightPanel:SetLayout("Fill")
     
     -- Store panel references
@@ -73,10 +77,11 @@ function UI:CreateMainFrame()
     -- Add container to wrapper
     wrapper:AddChild(container)
     
-    -- Add General Settings section below the three panels
+    -- Add General Settings section below the three panels (fixed height)
     local settingsGroup = AceGUI:Create("InlineGroup")
     settingsGroup:SetTitle("General Settings")
     settingsGroup:SetFullWidth(true)
+    settingsGroup:SetHeight(60)  -- Fixed small height for settings
     settingsGroup:SetLayout("Flow")
     
     -- Hide default AddOns button checkbox
