@@ -69,8 +69,7 @@ function UI:PopulateAddonList()
                 self.searchText = ""
                 searchBox:SetText("")
                 self:RefreshAddonList()
-                -- After clearing, button will still say "Clear" until user types
-                -- This is fine - clicking it again does nothing harmful
+                updateSearchButton()  -- Switch back to Search after clearing
             end)
         else
             -- Show Search button when search is empty
