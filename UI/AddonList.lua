@@ -96,7 +96,19 @@ function UI:PopulateAddonList()
     deselectAllBtn:SetDisabled(isReadOnly)
     deselectAllBtn:SetCallback("OnClick", function()
         if not profile then return end
-        profile.addons = {}
+        
+        local allAddons = AddonProfiles.AddonManager:GetAllAddons()
+        for name, info in pairs(allAddons) do
+            if name ~= "AddonProfiles" then
+                -- Only deselect visible addons (matching search)
+                if not self.searchText or self.searchText == "" or
+                   name:lower():find(self.searchText:lower(), 1, true) or
+                   info.title:lower():find(self.searchText:lower(), 1, true) then
+                    profile.addons[name] = nil
+                end
+            end
+        end
+        
         self:RefreshAddonList()
     end)
     btnGroup:AddChild(deselectAllBtn)
