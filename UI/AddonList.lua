@@ -54,6 +54,38 @@ function UI:PopulateAddonList()
     searchBox:SetText(self.searchText or "")
     searchBox:DisableButton(true)  -- Disable built-in button, we'll use our own
     
+    searchContainer:AddChild(searchBox)
+    
+    -- Separate Search/Clear button that's always visible
+    local searchBtn = AceGUI:Create("Button")
+    searchBtn:SetWidth(80)
+    
+    -- Function to update button state based on search text
+    local function updateSearchButton()
+        if self.searchText and self.searchText ~= "" then
+            -- Show Clear button when there's an active search
+            searchBtn:SetText("Clear")
+            searchBtn:SetCallback("OnClick", function()
+                self.searchText = ""
+                searchBox:SetText("")
+                self:RefreshAddonList()
+                -- After clearing, button will still say "Clear" until user types
+                -- This is fine - clicking it again does nothing harmful
+            end)
+        else
+            -- Show Search button when search is empty
+            searchBtn:SetText("Search")
+            searchBtn:SetCallback("OnClick", function()
+                local text = searchBox:GetText() or ""
+                -- Trim whitespace
+                text = text:match("^%s*(.-)%s*$") or ""
+                self.searchText = text
+                self:RefreshAddonList()
+                updateSearchButton()  -- Update button after search
+            end)
+        end
+    end
+    
     -- Enter key pressed
     searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
         local searchText = widget:GetText() or text or ""
@@ -61,21 +93,11 @@ function UI:PopulateAddonList()
         searchText = searchText:match("^%s*(.-)%s*$") or ""
         self.searchText = searchText
         self:RefreshAddonList()
+        updateSearchButton()  -- Update button after Enter
     end)
     
-    searchContainer:AddChild(searchBox)
-    
-    -- Separate Search button that's always visible
-    local searchBtn = AceGUI:Create("Button")
-    searchBtn:SetText("Search")
-    searchBtn:SetWidth(80)
-    searchBtn:SetCallback("OnClick", function()
-        local text = searchBox:GetText() or ""
-        -- Trim whitespace
-        text = text:match("^%s*(.-)%s*$") or ""
-        self.searchText = text
-        self:RefreshAddonList()
-    end)
+    -- Set initial button state
+    updateSearchButton()
     
     searchContainer:AddChild(searchBtn)
     container:AddChild(searchContainer)
