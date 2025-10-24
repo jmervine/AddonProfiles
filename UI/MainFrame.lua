@@ -43,21 +43,21 @@ function UI:CreateMainFrame()
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
     leftPanel:SetRelativeWidth(0.28)
-    leftPanel:SetFullHeight(true)
+    leftPanel:SetHeight(540)  -- Fixed height to match container
     leftPanel:SetLayout("Fill")
     
     -- Middle panel (Addon List) - 44% relative width  
     local middlePanel = AceGUI:Create("InlineGroup")
     middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
-    middlePanel:SetFullHeight(true)
+    middlePanel:SetHeight(540)  -- Fixed height to match container
     middlePanel:SetLayout("Fill")
     
     -- Right panel (Profile Settings) - 28% relative width (sums to 1.0)
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
     rightPanel:SetRelativeWidth(0.28)
-    rightPanel:SetFullHeight(true)
+    rightPanel:SetHeight(540)  -- Fixed height to match container
     rightPanel:SetLayout("Fill")
     
     -- Store panel references
