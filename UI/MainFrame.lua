@@ -93,23 +93,6 @@ function UI:CreateMainFrame()
     -- Hide by default
     frame:Hide()
     
-    -- Enable Escape key to close window
-    -- AceGUI frames have auto-generated names, register it with UISpecialFrames
-    local frameName = frame.frame:GetName()
-    if frameName then
-        -- Check if already in UISpecialFrames
-        local alreadyRegistered = false
-        for _, name in ipairs(UISpecialFrames) do
-            if name == frameName then
-                alreadyRegistered = true
-                break
-            end
-        end
-        if not alreadyRegistered then
-            tinsert(UISpecialFrames, frameName)
-        end
-    end
-    
     -- Callback when frame is closed
     frame:SetCallback("OnClose", function(widget)
         AceGUI:Release(widget)
