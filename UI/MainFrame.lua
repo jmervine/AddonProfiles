@@ -18,34 +18,21 @@ end
 function UI:CreateMainFrame()
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
+    frame:SetStatusText("AddonProfiles v" .. AddonProfiles.VERSION)
     frame:SetLayout("Fill")
     frame:SetWidth(950)
     frame:SetHeight(700)
     
     self.MainFrame = frame
     
-    local statusBar = frame.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    statusBar:SetPoint("BOTTOMLEFT", frame.frame, "BOTTOMLEFT", 10, 5)
-    statusBar:SetText("AddonProfiles v" .. AddonProfiles.VERSION)
-    
-    local hideDefaultCheckbox = CreateFrame("CheckButton", "AddonProfilesHideDefaultCheck", frame.frame, "UICheckButtonTemplate")
-    hideDefaultCheckbox:SetPoint("BOTTOMRIGHT", frame.frame, "BOTTOMRIGHT", -150, 5)
-    hideDefaultCheckbox:SetSize(24, 24)
-    hideDefaultCheckbox:SetChecked(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
-    hideDefaultCheckbox:SetScript("OnClick", function(self)
-        local checked = self:GetChecked()
-        AddonProfiles.db.global.settings.hideDefaultAddonsButton = checked
-        AddonProfiles:RefreshGameMenuButton()
-        AddonProfiles:Print(checked and "Default AddOns button hidden" or "Default AddOns button visible")
-    end)
-    
-    local checkboxLabel = frame.frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    checkboxLabel:SetPoint("LEFT", hideDefaultCheckbox, "RIGHT", 5, 0)
-    checkboxLabel:SetText("Hide default AddOns menu button")
+    local wrapper = AceGUI:Create("SimpleGroup")
+    wrapper:SetFullWidth(true)
+    wrapper:SetFullHeight(true)
+    wrapper:SetLayout("List")
     
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
-    container:SetFullHeight(true)
+    container:SetHeight(620)
     container:SetLayout("Flow")
     
     local leftPanel = AceGUI:Create("InlineGroup")
@@ -75,7 +62,26 @@ function UI:CreateMainFrame()
     container:AddChild(middlePanel)
     container:AddChild(rightPanel)
     
-    frame:AddChild(container)
+    wrapper:AddChild(container)
+    
+    local settingsPanel = AceGUI:Create("InlineGroup")
+    settingsPanel:SetTitle("General Settings")
+    settingsPanel:SetFullWidth(true)
+    settingsPanel:SetLayout("Flow")
+    
+    local hideDefaultCheckbox = AceGUI:Create("CheckBox")
+    hideDefaultCheckbox:SetLabel("Hide default AddOns menu button")
+    hideDefaultCheckbox:SetValue(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
+    hideDefaultCheckbox:SetCallback("OnValueChanged", function(widget, event, value)
+        AddonProfiles.db.global.settings.hideDefaultAddonsButton = value
+        AddonProfiles:RefreshGameMenuButton()
+        AddonProfiles:Print(value and "Default AddOns button hidden" or "Default AddOns button visible")
+    end)
+    settingsPanel:AddChild(hideDefaultCheckbox)
+    
+    wrapper:AddChild(settingsPanel)
+    
+    frame:AddChild(wrapper)
     
     -- Select active profile by default if none is selected
     if not self.currentProfile then
@@ -97,6 +103,7 @@ function UI:CreateMainFrame()
     end
     
     container:DoLayout()
+    wrapper:DoLayout()
     frame:DoLayout()
     
     -- Hide by default
