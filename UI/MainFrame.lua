@@ -38,19 +38,19 @@ function UI:CreateMainFrame()
     local leftPanel = AceGUI:Create("InlineGroup")
     leftPanel:SetTitle("Profiles")
     leftPanel:SetRelativeWidth(0.28)
-    leftPanel:SetFullHeight(true)
+    leftPanel:SetHeight(610)
     leftPanel:SetLayout("Fill")
     
     local middlePanel = AceGUI:Create("InlineGroup")
     middlePanel:SetTitle("AddOns")
     middlePanel:SetRelativeWidth(0.44)
-    middlePanel:SetFullHeight(true)
+    middlePanel:SetHeight(610)
     middlePanel:SetLayout("Fill")
     
     local rightPanel = AceGUI:Create("InlineGroup")
     rightPanel:SetTitle("Settings")
     rightPanel:SetRelativeWidth(0.28)
-    rightPanel:SetFullHeight(true)
+    rightPanel:SetHeight(610)
     rightPanel:SetLayout("Fill")
     
     -- Store panel references
