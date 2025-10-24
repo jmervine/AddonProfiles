@@ -113,6 +113,13 @@ function UI:PopulateAddonList()
     container:AddChild(spacer)
     self.addonListSpacer = spacer
     
+    -- Create scroll frame
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetFullWidth(true)
+    scroll:SetLayout("List")
+    self.addonListScroll = scroll
+    container:AddChild(scroll)
+    
     -- Initial addon list population
     self:RefreshAddonList()
     
