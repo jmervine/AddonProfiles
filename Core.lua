@@ -61,8 +61,8 @@ function AddonProfiles:AddGameMenuButton()
     -- Position it below the Addons button
     button:SetPoint("TOP", "GameMenuButtonAddons", "BOTTOM", 0, -1)
     
-    -- Adjust the rest of the menu
-    GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -16)
+    -- Adjust the rest of the menu with proper spacing
+    GameMenuButtonLogout:SetPoint("TOP", button, "BOTTOM", 0, -22)
     GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + button:GetHeight())
 end
 
