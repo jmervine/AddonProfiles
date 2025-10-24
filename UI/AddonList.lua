@@ -59,7 +59,7 @@ function UI:PopulateAddonList()
         -- Trim whitespace
         text = text:match("^%s*(.-)%s*$") or ""
         self.searchText = text
-        self:PopulateAddonList()
+        self:RefreshAddonList()  -- Only refresh scroll frame, not search box
     end)
     
     -- Enter key pressed
@@ -68,7 +68,7 @@ function UI:PopulateAddonList()
         -- Trim whitespace
         searchText = searchText:match("^%s*(.-)%s*$") or ""
         self.searchText = searchText
-        self:PopulateAddonList()
+        self:RefreshAddonList()  -- Only refresh scroll frame, not search box
     end)
     
     container:AddChild(searchBox)
