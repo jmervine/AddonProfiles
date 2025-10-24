@@ -50,13 +50,16 @@ function UI:PopulateAddonList()
     searchBox:DisableButton(true)  -- Remove OK button
     searchBox:SetCallback("OnTextChanged", function(widget, event, text)
         self.searchText = text
-        self:PopulateAddonList()
+        self:FilterAddonCheckboxes()
     end)
     searchBox:SetCallback("OnEnterPressed", function(widget, event, text)
         self.searchText = text
-        self:PopulateAddonList()
+        self:FilterAddonCheckboxes()
     end)
     container:AddChild(searchBox)
+    
+    -- Store reference for filtering
+    self.addonListSearchBox = searchBox
     
     -- Removed "Show only compatible" filter - not useful in practice
     
@@ -111,6 +114,10 @@ function UI:PopulateAddonList()
     scroll:SetFullWidth(true)
     scroll:SetLayout("List")
     
+    -- Store reference for filtering
+    self.addonListScroll = scroll
+    self.addonCheckboxes = {}
+    
     -- Get all addons
     local allAddons = AddonProfiles.AddonManager:GetAllAddons()
     
@@ -134,69 +141,81 @@ function UI:PopulateAddonList()
     end
     table.sort(addonNames)
     
-    local displayedCount = 0
-    
     for _, name in ipairs(addonNames) do
         local info = allAddons[name]
         
         -- Skip AddonProfiles itself
         if name ~= "AddonProfiles" then
-            -- Apply filters
-            local showAddon = true
+            local checkbox = AceGUI:Create("CheckBox")
             
-            -- Search filter
-            if self.searchText and self.searchText ~= "" then
-                local searchLower = self.searchText:lower()
-                if not (name:lower():find(searchLower, 1, true) or
-                       info.title:lower():find(searchLower, 1, true)) then
-                    showAddon = false
-                end
+            -- Build label
+            local label = info.title
+            if #info.dependencies > 0 then
+                label = label .. " (deps: " .. table.concat(info.dependencies, ", ") .. ")"
             end
             
-            if showAddon then
-                displayedCount = displayedCount + 1
-                
-                local checkbox = AceGUI:Create("CheckBox")
-                
-                -- Build label
-                local label = info.title
-                if #info.dependencies > 0 then
-                    label = label .. " (deps: " .. table.concat(info.dependencies, ", ") .. ")"
-                end
-                
-                checkbox:SetLabel(label)
-                checkbox:SetFullWidth(true)
-                checkbox:SetValue(profile.addons[name] == true)
-                
-                -- Disable if read-only or required by another addon's dependencies
-                if isReadOnly then
-                    checkbox:SetDisabled(true)
-                elseif requiredByDeps[name] and not profile.addons[name] then
-                    checkbox:SetDisabled(true)
-                    checkbox:SetValue(true) -- Show as checked but disabled
-                end
-                
-                if not isReadOnly then
-                    checkbox:SetCallback("OnValueChanged", function(widget, event, value)
-                        profile.addons[name] = value or nil
-                        -- Only update settings panel, not entire addon list (prevents scroll jump)
-                        self:PopulateSettings() -- Update dep count
-                    end)
-                end
-                
-                scroll:AddChild(checkbox)
+            checkbox:SetLabel(label)
+            checkbox:SetFullWidth(true)
+            checkbox:SetValue(profile.addons[name] == true)
+            
+            -- Store addon name for filtering
+            checkbox.addonName = name
+            checkbox.addonTitle = info.title
+            
+            -- Disable if read-only or required by another addon's dependencies
+            if isReadOnly then
+                checkbox:SetDisabled(true)
+            elseif requiredByDeps[name] and not profile.addons[name] then
+                checkbox:SetDisabled(true)
+                checkbox:SetValue(true) -- Show as checked but disabled
             end
+            
+            if not isReadOnly then
+                checkbox:SetCallback("OnValueChanged", function(widget, event, value)
+                    profile.addons[name] = value or nil
+                    -- Only update settings panel, not entire addon list (prevents scroll jump)
+                    self:PopulateSettings() -- Update dep count
+                end)
+            end
+            
+            scroll:AddChild(checkbox)
+            table.insert(self.addonCheckboxes, checkbox)
         end
     end
     
-    if displayedCount == 0 then
-        local noAddons = AceGUI:Create("Label")
-        noAddons:SetText("No addons match filter")
-        noAddons:SetFullWidth(true)
-        scroll:AddChild(noAddons)
-    end
+    -- Apply initial filter
+    self:FilterAddonCheckboxes()
     
     container:AddChild(scroll)
     self.MiddlePanel:AddChild(container)
+end
+
+function UI:FilterAddonCheckboxes()
+    if not self.addonCheckboxes then
+        return
+    end
+    
+    local searchLower = (self.searchText or ""):lower()
+    local hasSearch = searchLower ~= ""
+    local visibleCount = 0
+    
+    for _, checkbox in ipairs(self.addonCheckboxes) do
+        local show = true
+        
+        if hasSearch then
+            local nameMatch = checkbox.addonName:lower():find(searchLower, 1, true)
+            local titleMatch = checkbox.addonTitle:lower():find(searchLower, 1, true)
+            show = nameMatch or titleMatch
+        end
+        
+        if show then
+            visibleCount = visibleCount + 1
+        end
+        
+        -- Show/hide the checkbox frame
+        if checkbox.frame then
+            checkbox.frame:SetShown(show)
+        end
+    end
 end
 
