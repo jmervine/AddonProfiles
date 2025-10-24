@@ -18,21 +18,18 @@ end
 function UI:CreateMainFrame()
     local frame = AceGUI:Create("Frame")
     frame:SetTitle("Addon Profiles")
+    frame:SetStatusText("v" .. AddonProfiles.VERSION)
     frame:SetLayout("Fill")
     frame:SetWidth(950)
     frame:SetHeight(650)
     
     self.MainFrame = frame
     
-    local statusText = frame.frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    statusText:SetPoint("BOTTOMLEFT", 40, 18)
-    statusText:SetText("v" .. AddonProfiles.VERSION)
-    statusText:SetDrawLayer("OVERLAY", 7)
+    local statusBar = frame.statustext:GetParent()
     
-    local checkbox = CreateFrame("CheckButton", nil, frame.frame, "UICheckButtonTemplate")
-    checkbox:SetPoint("BOTTOMLEFT", 250, 16)
+    local checkbox = CreateFrame("CheckButton", nil, statusBar, "UICheckButtonTemplate")
+    checkbox:SetPoint("LEFT", frame.statustext, "RIGHT", 20, 0)
     checkbox:SetSize(24, 24)
-    checkbox:SetFrameStrata("HIGH")
     checkbox:SetChecked(AddonProfiles.db.global.settings.hideDefaultAddonsButton)
     checkbox:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
@@ -40,10 +37,9 @@ function UI:CreateMainFrame()
         AddonProfiles:RefreshGameMenuButton()
     end)
     
-    local checkLabel = frame.frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local checkLabel = statusBar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     checkLabel:SetPoint("LEFT", checkbox, "RIGHT", 5, 0)
     checkLabel:SetText("Hide default AddOns menu button")
-    checkLabel:SetDrawLayer("OVERLAY", 7)
     
     local container = AceGUI:Create("SimpleGroup")
     container:SetFullWidth(true)
