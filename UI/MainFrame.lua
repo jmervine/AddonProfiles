@@ -94,24 +94,21 @@ function UI:CreateMainFrame()
     frame:Hide()
     
     -- Enable Escape key to close window
-    -- Set up proper frame name and register with UISpecialFrames
-    if not frame.frame:GetName() then
-        frame.frame:SetName("AddonProfilesMainFrame")
-    end
-    
-    -- Make frame respond to Escape key
-    frame.frame:SetPropagateKeyboardInput(true)
-    frame.frame:SetScript("OnKeyDown", function(self, key)
-        if key == "ESCAPE" then
-            self:SetPropagateKeyboardInput(false)
-            frame:Hide()
-        else
-            self:SetPropagateKeyboardInput(true)
+    -- AceGUI frames have auto-generated names, register it with UISpecialFrames
+    local frameName = frame.frame:GetName()
+    if frameName then
+        -- Check if already in UISpecialFrames
+        local alreadyRegistered = false
+        for _, name in ipairs(UISpecialFrames) do
+            if name == frameName then
+                alreadyRegistered = true
+                break
+            end
         end
-    end)
-    
-    -- Also add to UISpecialFrames as backup
-    tinsert(UISpecialFrames, "AddonProfilesMainFrame")
+        if not alreadyRegistered then
+            tinsert(UISpecialFrames, frameName)
+        end
+    end
     
     -- Callback when frame is closed
     frame:SetCallback("OnClose", function(widget)
