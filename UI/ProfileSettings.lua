@@ -220,7 +220,10 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     dialog:SetTitle("Copy Profile")
     dialog:SetLayout("Flow")
     dialog:SetWidth(400)
-    dialog:SetHeight(250)
+    dialog:SetHeight(220)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
     
     -- Hide status bar and close button
     -- statusbg is the parent of statustext
@@ -239,6 +242,11 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
                 break
             end
         end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
     end
     
     -- New profile name input
@@ -363,7 +371,10 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
     dialog:SetTitle("Confirm Delete")
     dialog:SetLayout("Flow")
     dialog:SetWidth(350)
-    dialog:SetHeight(150)
+    dialog:SetHeight(120)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
     
     -- Hide status bar and close button
     -- statusbg is the parent of statustext
@@ -382,6 +393,11 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
                 break
             end
         end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
     end
     
     -- Confirmation message
@@ -440,7 +456,10 @@ function UI:ApplyProfile(profileName, profileScope)
     dialog:SetTitle("Confirm Apply")
     dialog:SetLayout("Flow")
     dialog:SetWidth(350)
-    dialog:SetHeight(180)
+    dialog:SetHeight(140)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
     
     -- Hide status bar and close button
     -- statusbg is the parent of statustext
@@ -459,6 +478,11 @@ function UI:ApplyProfile(profileName, profileScope)
                 break
             end
         end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
     end
     
     -- Confirmation message
