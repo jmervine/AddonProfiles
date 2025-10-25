@@ -4,7 +4,7 @@
 -- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.VERSION = "2.0.0-beta3"
+AddonProfiles.VERSION = "2.0.0"
 
 -- Database defaults
 local defaults = {
