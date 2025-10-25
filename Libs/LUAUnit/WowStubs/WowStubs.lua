@@ -172,6 +172,22 @@ function GetAddOnDependencies(index)
   return unpack_func(addon.dependencies)
 end
 
+-- ref: https://wowpedia.fandom.com/wiki/API_IsAddOnLoadOnDemand
+function IsAddOnLoadOnDemand(index)
+  local addon = wowAddonsStub[index]
+  if not addon then return false end
+  -- For testing, return false (not load on demand)
+  return false
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_IsAddOnLoaded
+function IsAddOnLoaded(index)
+  local addon = wowAddonsStub[index]
+  if not addon then return false end
+  -- For testing, return true if addon is enabled
+  return addon._enabled == true
+end
+
 -- Stub for C_Timer (used in Core.lua)
 C_Timer = C_Timer or {}
 function C_Timer.After(delay, callback)

@@ -6,7 +6,7 @@ local AddonManager = {}
 AddonProfiles.AddonManager = AddonManager
 
 -- GetAllAddons returns a table of all installed addons
--- Returns: { [addonName] = { name, title, enabled, loadable, reason, security, dependencies } }
+-- Returns: { [addonName] = { name, title, enabled, loadable, reason, security, dependencies, outOfDate } }
 function AddonManager:GetAllAddons()
     local addons = {}
     local numAddons = GetNumAddOns()
@@ -16,6 +16,14 @@ function AddonManager:GetAllAddons()
         local enabled = GetAddOnEnableState(nil, name) > 0
         local dependencies = self:GetAddonDependencies(name)
         
+        -- Check if addon is out of date
+        local outOfDate = false
+        if IsAddOnLoadOnDemand(i) then
+            outOfDate = not IsAddOnLoaded(i) and select(4, GetAddOnInfo(i)) == false and select(5, GetAddOnInfo(i)) == "INTERFACE_VERSION"
+        else
+            outOfDate = select(5, GetAddOnInfo(i)) == "INTERFACE_VERSION"
+        end
+        
         addons[name] = {
             name = name,
             title = title or name,
@@ -24,6 +32,7 @@ function AddonManager:GetAllAddons()
             reason = reason,
             security = security,
             dependencies = dependencies,
+            outOfDate = outOfDate,
             index = i
         }
     end
