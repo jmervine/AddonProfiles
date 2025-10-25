@@ -223,12 +223,21 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     dialog:SetHeight(250)
     
     -- Hide status bar and close button
-    if dialog.frame then
-        if dialog.frame.statusbg then
-            dialog.frame.statusbg:Hide()
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
         end
-        if dialog.closebutton then
-            dialog.closebutton:Hide()
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
         end
     end
     
@@ -357,12 +366,21 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
     dialog:SetHeight(150)
     
     -- Hide status bar and close button
-    if dialog.frame then
-        if dialog.frame.statusbg then
-            dialog.frame.statusbg:Hide()
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
         end
-        if dialog.closebutton then
-            dialog.closebutton:Hide()
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
         end
     end
     
@@ -425,12 +443,21 @@ function UI:ApplyProfile(profileName, profileScope)
     dialog:SetHeight(180)
     
     -- Hide status bar and close button
-    if dialog.frame then
-        if dialog.frame.statusbg then
-            dialog.frame.statusbg:Hide()
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
         end
-        if dialog.closebutton then
-            dialog.closebutton:Hide()
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
         end
     end
     
