@@ -4,7 +4,7 @@
 -- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.VERSION = "2.0.0-beta2"
+AddonProfiles.VERSION = "2.0.0"
 
 -- Database defaults
 local defaults = {
@@ -77,6 +77,14 @@ function AddonProfiles:AddGameMenuButton()
             if GameMenuButtonAddons then
                 local point, relativeTo, relativePoint, xOfs, yOfs = GameMenuButtonAddons:GetPoint()
                 button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+            end
+            
+            -- Apply ElvUI skin if available
+            if IsAddOnLoaded("ElvUI") then
+                local E = _G.ElvUI and _G.ElvUI[1]
+                if E and E.Skins then
+                    E.Skins:HandleButton(button)
+                end
             end
         end
         

@@ -220,7 +220,34 @@ function UI:ShowCopyProfileDialog(sourceProfileName, sourceProfileScope)
     dialog:SetTitle("Copy Profile")
     dialog:SetLayout("Flow")
     dialog:SetWidth(400)
-    dialog:SetHeight(250)
+    dialog:SetHeight(220)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
+    
+    -- Hide status bar and close button
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
+        end
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
+        end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
+    end
     
     -- New profile name input
     local nameLabel = AceGUI:Create("Label")
@@ -344,7 +371,34 @@ function UI:ConfirmDeleteProfile(profileName, profileScope)
     dialog:SetTitle("Confirm Delete")
     dialog:SetLayout("Flow")
     dialog:SetWidth(350)
-    dialog:SetHeight(150)
+    dialog:SetHeight(120)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
+    
+    -- Hide status bar and close button
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
+        end
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
+        end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
+    end
     
     -- Confirmation message
     local message = AceGUI:Create("Label")
@@ -402,7 +456,34 @@ function UI:ApplyProfile(profileName, profileScope)
     dialog:SetTitle("Confirm Apply")
     dialog:SetLayout("Flow")
     dialog:SetWidth(350)
-    dialog:SetHeight(180)
+    dialog:SetHeight(140)
+    
+    -- Disable resizing
+    dialog:EnableResize(false)
+    
+    -- Hide status bar and close button
+    -- statusbg is the parent of statustext
+    if dialog.statustext then
+        local statusbg = dialog.statustext:GetParent()
+        if statusbg then
+            statusbg:Hide()
+        end
+    end
+    
+    -- Find and hide the close button (it's a child of dialog.frame)
+    if dialog.frame then
+        for _, child in ipairs({dialog.frame:GetChildren()}) do
+            if child:GetObjectType() == "Button" and child:GetText() == CLOSE then
+                child:Hide()
+                break
+            end
+        end
+    end
+    
+    -- Adjust content area to fill space where status bar was
+    if dialog.content then
+        dialog.content:SetPoint("BOTTOMRIGHT", -17, 17)
+    end
     
     -- Confirmation message
     local message = AceGUI:Create("Label")
