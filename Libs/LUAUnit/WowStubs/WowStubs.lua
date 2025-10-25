@@ -32,17 +32,6 @@ wowAddonsStub = {
     reason   = "MISSING",
     security = "INSECURE", -- default for all non Bliz addons
     dependencies = {}
-  },
-  [4] = {
-    _enabled = true, -- non-Bliz public state, using for testing.
-    name     = "TestAddon_OutOfDate",
-    title    = "Test Addon Out of Date",
-    notes    = "Test Addon that is out of date",
-    loadable = false,
-    reason   = "INTERFACE_VERSION",
-    security = "INSECURE", -- default for all non Bliz addons
-    dependencies = {},
-    interface = "11507" -- Old interface version (current is 11508)
   }
 }
 
@@ -96,34 +85,7 @@ end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetBuildInfo
 function GetBuildInfo()
-  return "1.15.7", "12345", "Oct 10 2024", 11508
-end
-
--- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnMetadata
-function GetAddOnMetadata(index, field)
-  local addon
-  if type(index) == "number" then
-    addon = wowAddonsStub[index]
-  else
-    for _, a in ipairs(wowAddonsStub) do
-      if a.name == index then
-        addon = a
-        break
-      end
-    end
-  end
-  
-  if not addon then return nil end
-  
-  if field == "Interface" then
-    return addon.interface
-  elseif field == "Title" then
-    return addon.title
-  elseif field == "Notes" then
-    return addon.notes
-  end
-  
-  return nil
+  return "1.15.7", "12345", "Oct 10 2024", 11507
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnInfo
@@ -208,22 +170,6 @@ function GetAddOnDependencies(index)
   -- Use table.unpack for Lua 5.2+ or unpack for Lua 5.1
   local unpack_func = table.unpack or unpack
   return unpack_func(addon.dependencies)
-end
-
--- ref: https://wowpedia.fandom.com/wiki/API_IsAddOnLoadOnDemand
-function IsAddOnLoadOnDemand(index)
-  local addon = wowAddonsStub[index]
-  if not addon then return false end
-  -- For testing, return false (not load on demand)
-  return false
-end
-
--- ref: https://wowpedia.fandom.com/wiki/API_IsAddOnLoaded
-function IsAddOnLoaded(index)
-  local addon = wowAddonsStub[index]
-  if not addon then return false end
-  -- For testing, return true if addon is enabled
-  return addon._enabled == true
 end
 
 -- Stub for C_Timer (used in Core.lua)

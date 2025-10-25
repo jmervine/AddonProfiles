@@ -249,9 +249,6 @@ function UI:RefreshAddonList()
                 
                 -- Build label
                 local label = info.title
-                if info.outOfDate then
-                    label = label .. " |cFFFF6600[OUT OF DATE]|r"
-                end
                 if #info.dependencies > 0 then
                     label = label .. " (deps: " .. table.concat(info.dependencies, ", ") .. ")"
                 end

@@ -35,6 +35,6 @@ TestStubs = {} --class
   end
 
   function TestStubs:test_wowstubs_GetNumAddOns()
-    lu.assertEquals(GetNumAddOns(), 4)
+    lu.assertEquals(GetNumAddOns(), 3)
   end
 

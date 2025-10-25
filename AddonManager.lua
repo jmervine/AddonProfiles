@@ -6,27 +6,15 @@ local AddonManager = {}
 AddonProfiles.AddonManager = AddonManager
 
 -- GetAllAddons returns a table of all installed addons
--- Returns: { [addonName] = { name, title, enabled, loadable, reason, security, dependencies, outOfDate } }
+-- Returns: { [addonName] = { name, title, enabled, loadable, reason, security, dependencies } }
 function AddonManager:GetAllAddons()
     local addons = {}
     local numAddons = GetNumAddOns()
     
     for i = 1, numAddons do
-        local name, title, notes, loadable, reason, security = GetAddOnInfo(i)
+        local name, title, _, loadable, reason, security = GetAddOnInfo(i)
         local enabled = GetAddOnEnableState(nil, name) > 0
         local dependencies = self:GetAddonDependencies(name)
-        
-        -- Check if addon is out of date by comparing interface versions
-        local outOfDate = false
-        local addonInterface = GetAddOnMetadata(i, "Interface")
-        if addonInterface then
-            local currentInterface = select(4, GetBuildInfo())
-            -- Convert to numbers for comparison
-            local addonVersion = tonumber(addonInterface)
-            if addonVersion and currentInterface and addonVersion < currentInterface then
-                outOfDate = true
-            end
-        end
         
         addons[name] = {
             name = name,
@@ -36,7 +24,6 @@ function AddonManager:GetAllAddons()
             reason = reason,
             security = security,
             dependencies = dependencies,
-            outOfDate = outOfDate,
             index = i
         }
     end
