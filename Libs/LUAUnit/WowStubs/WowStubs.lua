@@ -41,7 +41,8 @@ wowAddonsStub = {
     loadable = false,
     reason   = "INTERFACE_VERSION",
     security = "INSECURE", -- default for all non Bliz addons
-    dependencies = {}
+    dependencies = {},
+    interface = "11507" -- Old interface version (current is 11508)
   }
 }
 
@@ -95,7 +96,34 @@ end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetBuildInfo
 function GetBuildInfo()
-  return "1.15.7", "12345", "Oct 10 2024", 11507
+  return "1.15.7", "12345", "Oct 10 2024", 11508
+end
+
+-- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnMetadata
+function GetAddOnMetadata(index, field)
+  local addon
+  if type(index) == "number" then
+    addon = wowAddonsStub[index]
+  else
+    for _, a in ipairs(wowAddonsStub) do
+      if a.name == index then
+        addon = a
+        break
+      end
+    end
+  end
+  
+  if not addon then return nil end
+  
+  if field == "Interface" then
+    return addon.interface
+  elseif field == "Title" then
+    return addon.title
+  elseif field == "Notes" then
+    return addon.notes
+  end
+  
+  return nil
 end
 
 -- ref: https://wowpedia.fandom.com/wiki/API_GetAddOnInfo

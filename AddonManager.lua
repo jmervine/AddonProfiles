@@ -16,9 +16,17 @@ function AddonManager:GetAllAddons()
         local enabled = GetAddOnEnableState(nil, name) > 0
         local dependencies = self:GetAddonDependencies(name)
         
-        -- Check if addon is out of date
-        -- When an addon is out of date, loadable is nil/false and reason is "INTERFACE_VERSION"
-        local outOfDate = (loadable == nil or loadable == false) and (reason == "INTERFACE_VERSION")
+        -- Check if addon is out of date by comparing interface versions
+        local outOfDate = false
+        local addonInterface = GetAddOnMetadata(i, "Interface")
+        if addonInterface then
+            local currentInterface = select(4, GetBuildInfo())
+            -- Convert to numbers for comparison
+            local addonVersion = tonumber(addonInterface)
+            if addonVersion and currentInterface and addonVersion < currentInterface then
+                outOfDate = true
+            end
+        end
         
         addons[name] = {
             name = name,
