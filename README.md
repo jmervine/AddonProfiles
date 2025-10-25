@@ -3,7 +3,7 @@
 
 A World of Warcraft Classic addon that allows you to save and manage profiles of your addon configurations. Perfect for players who use different addons for different activities (leveling, raiding, PvP, etc.).
 
-> **Version 2.0.0-alpha1** - Complete rewrite with UI support!
+> **Version 2.0.0** - Complete rewrite with UI support!
 
 <img width="1177" height="802" alt="image" src="https://github.com/user-attachments/assets/b5a1f3ed-e02c-4c8e-995b-ec1f634d5493" />
 
