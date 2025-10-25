@@ -12,17 +12,13 @@ function AddonManager:GetAllAddons()
     local numAddons = GetNumAddOns()
     
     for i = 1, numAddons do
-        local name, title, _, loadable, reason, security = GetAddOnInfo(i)
+        local name, title, notes, loadable, reason, security = GetAddOnInfo(i)
         local enabled = GetAddOnEnableState(nil, name) > 0
         local dependencies = self:GetAddonDependencies(name)
         
         -- Check if addon is out of date
-        local outOfDate = false
-        if IsAddOnLoadOnDemand(i) then
-            outOfDate = not IsAddOnLoaded(i) and select(4, GetAddOnInfo(i)) == false and select(5, GetAddOnInfo(i)) == "INTERFACE_VERSION"
-        else
-            outOfDate = select(5, GetAddOnInfo(i)) == "INTERFACE_VERSION"
-        end
+        -- When an addon is out of date, loadable is nil/false and reason is "INTERFACE_VERSION"
+        local outOfDate = (loadable == nil or loadable == false) and (reason == "INTERFACE_VERSION")
         
         addons[name] = {
             name = name,

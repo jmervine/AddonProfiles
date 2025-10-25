@@ -32,6 +32,16 @@ wowAddonsStub = {
     reason   = "MISSING",
     security = "INSECURE", -- default for all non Bliz addons
     dependencies = {}
+  },
+  [4] = {
+    _enabled = true, -- non-Bliz public state, using for testing.
+    name     = "TestAddon_OutOfDate",
+    title    = "Test Addon Out of Date",
+    notes    = "Test Addon that is out of date",
+    loadable = false,
+    reason   = "INTERFACE_VERSION",
+    security = "INSECURE", -- default for all non Bliz addons
+    dependencies = {}
   }
 }
 
