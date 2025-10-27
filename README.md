@@ -22,7 +22,11 @@ A World of Warcraft Classic addon that allows you to save and manage profiles of
 - World of Warcraft Classic: 20th Anniversary Edition (1.15.7)
 - Ace3 library (included)
 
-## Installation
+## Installation - CurseForge
+
+*Visit: https://www.curseforge.com/wow/addons/addon-profiles*
+
+## Installation - GitHub
 
 1. Visit the [GitHub releases page](https://github.com/jmervine/wow-AddonProfiles/releases)
 2. Download the latest release
