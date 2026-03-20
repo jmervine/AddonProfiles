@@ -19,7 +19,7 @@ A World of Warcraft Classic addon that allows you to save and manage profiles of
 
 ## Requirements
 
-- World of Warcraft Classic: 20th Anniversary Edition (1.15.7)
+- World of Warcraft Classic: 20th Anniversary Edition (1.15.7) **OR** TBC Anniversary (2.5.x)
 - Ace3 library (included)
 
 ## Installation - CurseForge
@@ -205,7 +205,7 @@ This addon is provided as-is for World of Warcraft players. Feel free to modify 
 - Added dependency auto-inclusion with per-profile toggle
 - Added profile search and filtering
 - Migration support from v1.x format
-- Updated for WoW Classic 1.15.7 (20th Anniversary Edition)
+- Updated for WoW Classic Anniversary (1.15.7) and TBC Anniversary (2.5.x)
 
 ### v0.0.3-beta1 (Legacy)
 - Original slash command-based implementation

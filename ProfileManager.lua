@@ -153,7 +153,7 @@ function ProfileManager:ActivateProfile(name, scope)
     -- Disable all addons first, except AddonProfiles itself
     for addonName, _ in pairs(allAddons) do
         if addonName ~= "AddonProfiles" then
-            DisableAddOn(addonName)
+            AddonProfiles.AddonManager:DisableAddOn(addonName)
         end
     end
     
@@ -161,7 +161,7 @@ function ProfileManager:ActivateProfile(name, scope)
     addonManager:EnableAddons(addonsToEnable)
     
     -- Always enable AddonProfiles itself
-    EnableAddOn("AddonProfiles")
+    AddonProfiles.AddonManager:EnableAddOn("AddonProfiles")
     
     -- Set as active profile
     local db = scope == "account" and AddonProfiles.db.global or AddonProfiles.db.char

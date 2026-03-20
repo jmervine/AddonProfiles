@@ -4,7 +4,7 @@
 -- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.VERSION = "2.0.0"
+AddonProfiles.VERSION = "2.0.1"
 
 -- Database defaults
 local defaults = {
@@ -24,16 +24,19 @@ local defaults = {
 function AddonProfiles:OnInitialize()
     -- Initialize AceDB
     self.db = LibStub("AceDB-3.0"):New("AddonProfilesDB", defaults, true)
-    
+
+    -- Validate TBC Anniversary API compatibility
+    self:ValidateAPICompatibility()
+
     -- Migrate old data if present
     self:MigrateOldData()
-    
+
     -- Register slash commands
     self:RegisterChatCommand("addonprofiles", "SlashHandler")
     self:RegisterChatCommand("ap", "SlashHandler")
-    
+
     -- Print welcome message
-    self:Print(string.format("v%s loaded! Type '/ap' or '/addonprofiles' to open the UI.", self.VERSION))
+    self:Print(string.format("v%s loaded for TBC Anniversary! Type '/ap' to open the UI.", self.VERSION))
 end
 
 function AddonProfiles:OnEnable()
@@ -80,7 +83,7 @@ function AddonProfiles:AddGameMenuButton()
             end
             
             -- Apply ElvUI skin if available
-            if IsAddOnLoaded("ElvUI") then
+            if AddonProfiles.AddonManager:IsAddOnLoaded("ElvUI") then
                 local E = _G.ElvUI and _G.ElvUI[1]
                 if E and E.Skins then
                     E.Skins:HandleButton(button)
@@ -106,6 +109,24 @@ end
 -- Refresh the game menu button (called when settings change)
 function AddonProfiles:RefreshGameMenuButton()
     self:AddGameMenuButton()
+end
+
+-- ValidateAPICompatibility checks if critical TBC Anniversary APIs work
+function AddonProfiles:ValidateAPICompatibility()
+    -- Test the most likely API change: GetAddOnEnableState parameter
+    local success, result = pcall(GetAddOnEnableState, "player", "AddonProfiles")
+    if not success then
+        self:Print("WARNING: TBC Anniversary API validation failed!")
+        self:Print("GetAddOnEnableState may use different parameters than expected.")
+        self:Print("Addon may not function correctly. Please report this issue.")
+    end
+
+    -- Log detected API features
+    if C_AddOns then
+        self:Print("Detected C_AddOns namespace - using modern addon APIs")
+    else
+        self:Print("Using classic addon APIs with TBC Anniversary parameter format")
+    end
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
@@ -365,18 +386,19 @@ function AddonProfiles:DeleteProfile(name)
     end
 end
 
+
 function AddonProfiles:OpenUI()
     -- Ensure UI module exists
     if not self.UI or not self.UI.Show then
         self:Print("Error: UI module not loaded")
         return
     end
-    
+
     -- Call Show() which handles lazy frame creation
     local success, err = pcall(function()
         self.UI:Show()
     end)
-    
+
     if not success then
         self:Print("Error opening UI: " .. tostring(err))
         self:Print("Please report this error at: https://github.com/jmervine/AddonProfiles/issues")
