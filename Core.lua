@@ -44,19 +44,31 @@ function AddonProfiles:OnEnable()
     if not self.UI then
         self.UI = {}
     end
-    
+
     -- Initialize UI module (sets up namespace only)
     if self.UI.Initialize then
         self.UI:Initialize()
     end
-    
+
     -- Hook GameMenuFrame to add our button when it's shown
-    GameMenuFrame:HookScript("OnShow", function()
-        if not self.gameMenuButtonAdded then
-            self:AddGameMenuButton()
-            self.gameMenuButtonAdded = true
+    -- Use pcall to prevent addon from crashing if GameMenuFrame doesn't exist
+    local success, err = pcall(function()
+        if GameMenuFrame then
+            GameMenuFrame:HookScript("OnShow", function()
+                if not self.gameMenuButtonAdded then
+                    self:AddGameMenuButton()
+                    self.gameMenuButtonAdded = true
+                end
+            end)
+        else
+            self:Print("WARNING: GameMenuFrame not found - menu button will not be added")
         end
     end)
+
+    if not success then
+        self:Print("WARNING: Failed to hook GameMenuFrame: " .. tostring(err))
+        self:Print("Menu integration may not work correctly")
+    end
 end
 
 -- Add a button to the game menu (Escape menu)
@@ -113,19 +125,23 @@ end
 
 -- ValidateAPICompatibility checks if critical TBC Anniversary APIs work
 function AddonProfiles:ValidateAPICompatibility()
-    -- Test the most likely API change: GetAddOnEnableState parameter
-    local success, result = pcall(GetAddOnEnableState, "player", "AddonProfiles")
-    if not success then
-        self:Print("WARNING: TBC Anniversary API validation failed!")
-        self:Print("GetAddOnEnableState may use different parameters than expected.")
-        self:Print("Addon may not function correctly. Please report this issue.")
+    -- Test basic addon APIs
+    local numAddons = 0
+    local success, result = pcall(GetNumAddOns)
+    if success and result then
+        numAddons = result
+        self:Printf("TBC Anniversary: Detected %d addons", numAddons)
+    else
+        self:Print("ERROR: GetNumAddOns() failed - addon may not work!")
+        return
     end
 
-    -- Log detected API features
-    if C_AddOns then
-        self:Print("Detected C_AddOns namespace - using modern addon APIs")
+    -- Test GetAddOnEnableState
+    local success, enableState = pcall(GetAddOnEnableState, "AddonProfiles")
+    if success then
+        self:Print("TBC Anniversary: API validation successful")
     else
-        self:Print("Using classic addon APIs with TBC Anniversary parameter format")
+        self:Print("WARNING: GetAddOnEnableState failed - there may be issues")
     end
 end
 

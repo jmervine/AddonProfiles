@@ -5,56 +5,32 @@ local AddonProfiles = LibStub("AceAddon-3.0"):GetAddon("AddonProfiles")
 local AddonManager = {}
 AddonProfiles.AddonManager = AddonManager
 
--- TBC Anniversary API wrappers
+-- TBC Anniversary uses standard WoW APIs - no C_AddOns namespace
 function AddonManager:GetNumAddOns()
-    -- Try C_AddOns first (TBC Anniversary may have this), fallback to classic
-    if C_AddOns and C_AddOns.GetNumAddOns then
-        return C_AddOns.GetNumAddOns()
-    else
-        return GetNumAddOns()
-    end
+    return GetNumAddOns()
 end
 
 function AddonManager:GetAddOnInfo(index)
-    -- Try C_AddOns first, fallback to classic
-    if C_AddOns and C_AddOns.GetAddOnInfo then
-        return C_AddOns.GetAddOnInfo(index)
-    else
-        return GetAddOnInfo(index)
-    end
+    return GetAddOnInfo(index)
 end
 
 function AddonManager:IsAddOnEnabled(addonName)
-    -- TBC Anniversary likely uses "player" instead of nil
-    local enableState = GetAddOnEnableState("player", addonName)
+    -- TBC Anniversary: GetAddOnEnableState([character], name)
+    -- character parameter is optional, so we can call with just name
+    local enableState = GetAddOnEnableState(addonName)
     return enableState and enableState > 0
 end
 
 function AddonManager:EnableAddOn(addonName)
-    -- Try C_AddOns first, fallback to classic
-    if C_AddOns and C_AddOns.EnableAddOn then
-        C_AddOns.EnableAddOn(addonName)
-    else
-        EnableAddOn(addonName)
-    end
+    EnableAddOn(addonName)
 end
 
 function AddonManager:DisableAddOn(addonName)
-    -- Try C_AddOns first, fallback to classic
-    if C_AddOns and C_AddOns.DisableAddOn then
-        C_AddOns.DisableAddOn(addonName)
-    else
-        DisableAddOn(addonName)
-    end
+    DisableAddOn(addonName)
 end
 
 function AddonManager:IsAddOnLoaded(addonName)
-    -- Try C_AddOns first, fallback to classic
-    if C_AddOns and C_AddOns.IsAddOnLoaded then
-        return C_AddOns.IsAddOnLoaded(addonName)
-    else
-        return IsAddOnLoaded(addonName)
-    end
+    return IsAddOnLoaded(addonName)
 end
 
 -- GetAllAddons returns a table of all installed addons
@@ -89,17 +65,9 @@ end
 -- Returns: table - array of dependency addon names
 function AddonManager:GetAddonDependencies(addonName)
     local dependencies = {}
-
-    -- Try C_AddOns namespace first (TBC Anniversary may have this)
-    if C_AddOns and C_AddOns.GetAddOnDependencies then
-        local deps = C_AddOns.GetAddOnDependencies(addonName)
-        if deps and type(deps) == "table" then
-            return deps
-        end
-    end
-
-    -- Fallback to classic approach
     local numAddons = self:GetNumAddOns()
+
+    -- Find addon index
     local addonIndex = nil
     for i = 1, numAddons do
         local name = self:GetAddOnInfo(i)
@@ -113,7 +81,7 @@ function AddonManager:GetAddonDependencies(addonName)
         return dependencies
     end
 
-    -- Get dependencies using classic API
+    -- Get dependencies using TBC Anniversary API
     local numDeps = select("#", GetAddOnDependencies(addonIndex))
     if numDeps and numDeps > 0 then
         for i = 1, numDeps do
