@@ -4,7 +4,7 @@
 -- Build "AddonProfiles" addon
 AddonProfiles = LibStub("AceAddon-3.0"):NewAddon("AddonProfiles", "AceConsole-3.0")
 AddonProfiles.ADDON_NAME = "AddonProfiles"
-AddonProfiles.VERSION = "2.0.0"
+AddonProfiles.VERSION = "2.0.1"
 
 -- Database defaults
 local defaults = {
@@ -24,16 +24,19 @@ local defaults = {
 function AddonProfiles:OnInitialize()
     -- Initialize AceDB
     self.db = LibStub("AceDB-3.0"):New("AddonProfilesDB", defaults, true)
-    
+
+    -- Validate TBC Anniversary API compatibility
+    self:ValidateAPICompatibility()
+
     -- Migrate old data if present
     self:MigrateOldData()
-    
+
     -- Register slash commands
     self:RegisterChatCommand("addonprofiles", "SlashHandler")
     self:RegisterChatCommand("ap", "SlashHandler")
-    
+
     -- Print welcome message
-    self:Print(string.format("v%s loaded! Type '/ap' or '/addonprofiles' to open the UI.", self.VERSION))
+    self:Print(string.format("v%s loaded for TBC Anniversary! Type '/ap' to open the UI.", self.VERSION))
 end
 
 function AddonProfiles:OnEnable()
@@ -41,19 +44,31 @@ function AddonProfiles:OnEnable()
     if not self.UI then
         self.UI = {}
     end
-    
+
     -- Initialize UI module (sets up namespace only)
     if self.UI.Initialize then
         self.UI:Initialize()
     end
-    
+
     -- Hook GameMenuFrame to add our button when it's shown
-    GameMenuFrame:HookScript("OnShow", function()
-        if not self.gameMenuButtonAdded then
-            self:AddGameMenuButton()
-            self.gameMenuButtonAdded = true
+    -- Use pcall to prevent addon from crashing if GameMenuFrame doesn't exist
+    local success, err = pcall(function()
+        if GameMenuFrame then
+            GameMenuFrame:HookScript("OnShow", function()
+                if not self.gameMenuButtonAdded then
+                    self:AddGameMenuButton()
+                    self.gameMenuButtonAdded = true
+                end
+            end)
+        else
+            self:Print("WARNING: GameMenuFrame not found - menu button will not be added")
         end
     end)
+
+    if not success then
+        self:Print("WARNING: Failed to hook GameMenuFrame: " .. tostring(err))
+        self:Print("Menu integration may not work correctly")
+    end
 end
 
 -- Add a button to the game menu (Escape menu)
@@ -80,7 +95,7 @@ function AddonProfiles:AddGameMenuButton()
             end
             
             -- Apply ElvUI skin if available
-            if IsAddOnLoaded("ElvUI") then
+            if AddonProfiles.AddonManager:IsAddOnLoaded("ElvUI") then
                 local E = _G.ElvUI and _G.ElvUI[1]
                 if E and E.Skins then
                     E.Skins:HandleButton(button)
@@ -106,6 +121,28 @@ end
 -- Refresh the game menu button (called when settings change)
 function AddonProfiles:RefreshGameMenuButton()
     self:AddGameMenuButton()
+end
+
+-- ValidateAPICompatibility checks if critical TBC Anniversary APIs work
+function AddonProfiles:ValidateAPICompatibility()
+    -- Test basic addon APIs
+    local numAddons = 0
+    local success, result = pcall(GetNumAddOns)
+    if success and result then
+        numAddons = result
+        self:Printf("TBC Anniversary: Detected %d addons", numAddons)
+    else
+        self:Print("ERROR: GetNumAddOns() failed - addon may not work!")
+        return
+    end
+
+    -- Test GetAddOnEnableState
+    local success, enableState = pcall(GetAddOnEnableState, "AddonProfiles")
+    if success then
+        self:Print("TBC Anniversary: API validation successful")
+    else
+        self:Print("WARNING: GetAddOnEnableState failed - there may be issues")
+    end
 end
 
 -- MigrateOldData migrates from v1 AddonProfilesStore format to v2 AceDB format
@@ -365,18 +402,19 @@ function AddonProfiles:DeleteProfile(name)
     end
 end
 
+
 function AddonProfiles:OpenUI()
     -- Ensure UI module exists
     if not self.UI or not self.UI.Show then
         self:Print("Error: UI module not loaded")
         return
     end
-    
+
     -- Call Show() which handles lazy frame creation
     local success, err = pcall(function()
         self.UI:Show()
     end)
-    
+
     if not success then
         self:Print("Error opening UI: " .. tostring(err))
         self:Print("Please report this error at: https://github.com/jmervine/AddonProfiles/issues")

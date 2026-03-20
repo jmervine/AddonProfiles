@@ -5,17 +5,45 @@ local AddonProfiles = LibStub("AceAddon-3.0"):GetAddon("AddonProfiles")
 local AddonManager = {}
 AddonProfiles.AddonManager = AddonManager
 
+-- TBC Anniversary uses standard WoW APIs - no C_AddOns namespace
+function AddonManager:GetNumAddOns()
+    return GetNumAddOns()
+end
+
+function AddonManager:GetAddOnInfo(index)
+    return GetAddOnInfo(index)
+end
+
+function AddonManager:IsAddOnEnabled(addonName)
+    -- TBC Anniversary: GetAddOnEnableState([character], name)
+    -- character parameter is optional, so we can call with just name
+    local enableState = GetAddOnEnableState(addonName)
+    return enableState and enableState > 0
+end
+
+function AddonManager:EnableAddOn(addonName)
+    EnableAddOn(addonName)
+end
+
+function AddonManager:DisableAddOn(addonName)
+    DisableAddOn(addonName)
+end
+
+function AddonManager:IsAddOnLoaded(addonName)
+    return IsAddOnLoaded(addonName)
+end
+
 -- GetAllAddons returns a table of all installed addons
 -- Returns: { [addonName] = { name, title, enabled, loadable, reason, security, dependencies } }
 function AddonManager:GetAllAddons()
     local addons = {}
-    local numAddons = GetNumAddOns()
-    
+    local numAddons = self:GetNumAddOns()
+
     for i = 1, numAddons do
-        local name, title, _, loadable, reason, security = GetAddOnInfo(i)
-        local enabled = GetAddOnEnableState(nil, name) > 0
+        local name, title, _, loadable, reason, security = self:GetAddOnInfo(i)
+        local enabled = self:IsAddOnEnabled(name)
         local dependencies = self:GetAddonDependencies(name)
-        
+
         addons[name] = {
             name = name,
             title = title or name,
@@ -27,7 +55,7 @@ function AddonManager:GetAllAddons()
             index = i
         }
     end
-    
+
     return addons
 end
 
@@ -37,24 +65,23 @@ end
 -- Returns: table - array of dependency addon names
 function AddonManager:GetAddonDependencies(addonName)
     local dependencies = {}
-    local numAddons = GetNumAddOns()
-    
+    local numAddons = self:GetNumAddOns()
+
     -- Find addon index
     local addonIndex = nil
     for i = 1, numAddons do
-        local name = GetAddOnInfo(i)
+        local name = self:GetAddOnInfo(i)
         if name == addonName then
             addonIndex = i
             break
         end
     end
-    
+
     if not addonIndex then
         return dependencies
     end
-    
-    -- Get dependencies
-    -- GetAddOnDependencies returns all deps as multiple return values
+
+    -- Get dependencies using TBC Anniversary API
     local numDeps = select("#", GetAddOnDependencies(addonIndex))
     if numDeps and numDeps > 0 then
         for i = 1, numDeps do
@@ -64,7 +91,7 @@ function AddonManager:GetAddonDependencies(addonName)
             end
         end
     end
-    
+
     return dependencies
 end
 
@@ -73,7 +100,7 @@ end
 --   addonName: string - name of the addon
 -- Returns: boolean
 function AddonManager:IsAddonEnabled(addonName)
-    return GetAddOnEnableState(nil, addonName) > 0
+    return self:IsAddOnEnabled(addonName)
 end
 
 -- EnableAddons enables the specified list of addons
@@ -96,7 +123,7 @@ function AddonManager:EnableAddons(addonList)
         end
         
         if addonName then
-            EnableAddOn(addonName)
+            self:EnableAddOn(addonName)
         end
     end
 end
@@ -121,7 +148,7 @@ function AddonManager:DisableAddons(addonList)
         end
         
         if addonName then
-            DisableAddOn(addonName)
+            self:DisableAddOn(addonName)
         end
     end
 end

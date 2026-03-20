@@ -21,6 +21,7 @@ require("test.profile_manager_test")
 require("test.migration_test")
 require("test.core_test")
 require("test.cross_character_test")
+require("test.tbc_anniversary_test")
 
 -- EXEC
 local runner = lu.LuaUnit.new()
